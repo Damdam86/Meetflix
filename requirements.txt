@@ -1,8 +1,8 @@
 streamlit==1.40.2
-pandas==2.2.3
+pandas==1.5.3
 numpy<1.25.0
 plotly==5.24.1
 seaborn==0.13.2
-scikit-learn==1.6.0
-st-aggrid==0.3.2  # Assurez-vous que cette version est compatible avec Python 3.11.
+scikit-learn==1.1.3
+st-aggrid==0.3.2
 streamlit-antd-components==0.3.2
