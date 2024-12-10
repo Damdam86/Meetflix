@@ -9,6 +9,7 @@ import streamlit as st
 api_key = st.secrets['API_KEY']
 
 # Chargement et préparation des données
+@st.cache_data
 def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'):
     # Chargement du dataset
     data = pd.read_csv(file_path)
