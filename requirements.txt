@@ -7,3 +7,4 @@ duckdb
 streamlit-antd-components
 streamlit-jupyter
 scikit-learn
+streamlit_pandas
