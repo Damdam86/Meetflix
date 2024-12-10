@@ -13,7 +13,7 @@ from st_aggrid import AgGrid
 
 notebook_path = "C:/Users/cohen/Desktop/Data/Projet_2/source/Les_etapes_cleaning_merging.ipynb"
 
-file_path = 'C:/Users/cohen/Desktop/Data/Projet_2/source/tmdb_movie_list.csv'
+file_path = 'https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'
 df = pd.read_csv(file_path, sep=',')
 
 def load_notebook_as_html(notebook_path):
@@ -94,7 +94,7 @@ header .logo {
 st.markdown(css, unsafe_allow_html=True)
 
 # Chargement des données
-data = pd.read_csv('source/tmdb_movie_list.CSV')
+data = pd.read_csv('https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv')
 
 # Titre de la page
 st.markdown("""
@@ -225,10 +225,8 @@ elif selection == "Etape 4":
 elif selection == "Etape 5":
     @st.cache_data
     def load_data():
-        df = pd.read_csv(file)
+        df = pd.read_csv(file_path)
         return df
     df = data
-    all_widgets = sp.create_widgets(df)
-    res = sp.filter_df(df, all_widgets)
     st.header("Result DataFrame")
-    st.write(res)
+    st.dataframe(df)
