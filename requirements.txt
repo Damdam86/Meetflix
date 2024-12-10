@@ -5,3 +5,4 @@ plotly
 seaborn
 scikit-learn
 setuptools
+streamlit_antd_components
