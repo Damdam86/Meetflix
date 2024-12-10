@@ -7,9 +7,4 @@ scikit-learn
 setuptools
 streamlit_antd_components
 streamlit_jupyter
-plotly.express
-matplotlib.pyplot
-streamlit.components.v1
-nbformat
-nbconvert
 st_aggrid
