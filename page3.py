@@ -8,7 +8,6 @@ import streamlit.components.v1 as components
 from streamlit_jupyter import StreamlitPatcher, tqdm
 import nbformat
 from nbconvert import HTMLExporter
-import streamlit_pandas as sp
 from st_aggrid import AgGrid
 
 notebook_path = "C:/Users/cohen/Desktop/Data/Projet_2/source/Les_etapes_cleaning_merging.ipynb"
