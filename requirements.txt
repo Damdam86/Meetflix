@@ -5,3 +5,5 @@ plotly
 seaborn
 duckdb
 streamlit-antd-components
+streamlit-jupyter
+scikit-learn
