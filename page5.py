@@ -5,6 +5,99 @@ from fonctions import get_actors_info
 # Clé API pour TMDb
 api_key = st.secrets['API_KEY']
 
+
+
+# CSS pour la page
+css = """
+<style>
+.stApp {
+    background-color: #00050d;
+    color: white;
+}
+
+/* Navigation */
+.nav-container {
+    background-color: rgba(0, 5, 13, 0.9);
+    padding: 1rem;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    margin-left: 2rem;
+}
+.nav-links a {
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+.nav-links a:hover {
+    color: white;
+}
+
+/* Movie Details */
+.movie-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+.movie-info {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+.movie-meta {
+    color: #cccccc;
+    font-size: 0.9rem;
+}
+.movie-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.movie-card:hover {
+    transform: scale(1.05);
+}
+.movie-poster {
+    width: 50%;
+    border-radius: 4px;
+}
+
+/* Cast Section */
+.circular-image {
+    display: block;
+    margin: 0 auto;
+    border-radius: 50%;
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+}
+.actor-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.actor-name {
+    font-weight: bold;
+    margin-top: 10px;
+}
+.actor-role {
+    font-style: italic;
+    color: gray;
+}
+
+/* Recommendations */
+.recommendations {
+    margin-top: 3rem;
+}
+</style>
+
+"""
+
+# Insertion du CSS dans la page Streamlit
+st.markdown(css, unsafe_allow_html=True)
+
 ######################################## DEBUT PAGE ####################################################
 
 # Récupération des paramètres de l'URL pour obtenir l'ID de l'acteur
