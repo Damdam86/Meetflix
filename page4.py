@@ -14,40 +14,90 @@ movie_id = query_params.get("movie_id", [None])[0]
 # CSS pour la page
 css = """
 <style>
-:root {
-    --background-color: #121212;
-    --primary-color: #01d277;
-    --secondary-color: #ffffff;
-    --text-color: #e0e0e0;
-    --text-muted: #9e9e9e;
-    --font-family: 'Roboto', sans-serif;
-    --border-radius: 8px;
-    --transition-speed: 0.3s ease-in-out;
+.stApp {
+    background-color: #00050d;
+    color: white;
 }
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+
+/* Navigation */
+.nav-container {
+    background-color: rgba(0, 5, 13, 0.9);
+    padding: 1rem;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
 }
-body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    font-family: var(--font-family);
-    line-height: 1.6;
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    margin-left: 2rem;
 }
+.nav-links a {
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+.nav-links a:hover {
+    color: white;
+}
+/* Buttons */
+.play-button {
+    background-color: #00a8e1;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 1rem;
+}
+.info-button {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+/* Movie Details */
+.movie-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+.movie-info {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+.movie-meta {
+    color: #cccccc;
+    font-size: 0.9rem;
+}
+.movie-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.movie-card:hover {
+    transform: scale(1.05);
+}
+.movie-poster {
+    width: 60%;
+    border-radius: 4px;
+}
+/* Cast Section */
 .circular-image {
     display: block;
     margin: 0 auto;
     border-radius: 50%;
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     object-fit: cover;
 }
-.actor-container {
-    text-align: center;
-    margin-bottom: 30px;
+.circular-image:hover {
+    transform: scale(1.05);
 }
-.film-container {
+.actor-container {
     text-align: center;
     margin-bottom: 30px;
 }
@@ -59,31 +109,17 @@ body {
     font-style: italic;
     color: gray;
 }
-a {
-    color: black;
-    text-decoration: none;
-}
-header {
-    background-color: #1c1c1c;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-header a {
-    color: var(--secondary-color);
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 18px;
-}
-header a:hover {
-    color: var(--primary-color);
+
+/* Recommendations */
+.recommendations {
+    margin-top: 3rem;
 }
 </style>
+
 """
 
 # Insertion du CSS dans la page Streamlit
-#st.markdown(css, unsafe_allow_html=True)
+st.markdown(css, unsafe_allow_html=True)
 
 
 #page = st_navbar(["Accueil", "Documentation", "Examples", "Community", "About"])
@@ -125,17 +161,20 @@ with col2:  # Informations principales
         st.markdown(f"**Genres :** {', '.join(genre_names)}")
     st.markdown(f"**Note TMDb :** ⭐ {data.loc[data['id'] == selected_movie_id, 'vote_average'].values[0]}")
     st.markdown(f"**Nbre de votes :** 👍 {data.loc[data['id'] == selected_movie_id, 'vote_count'].values[0]}")
-    st.button("Ajouter à la liste de favoris")
-    st.button("Réservez votre place")
+   # Buttons
+    st.markdown("""
+    <button class='play-button'>▶ Voir le film</button>
+    <button class='info-button'>+ Ajouter aux favoris</button>
+    """, unsafe_allow_html=True)
     st.markdown(f"**A voir sur :** ")
 
 
 with col3:  # Résumé et détails techniques
-    st.markdown("#### 📝 Résumé")
+    st.markdown("#### 📝 Synopsis")
     st.write(data.loc[data['id'] == selected_movie_id, 'overview'].values[0])
 
     # Affichage des acteurs principaux
-    st.markdown("#### 📸 Têtes d'affiche :")
+    st.markdown("#### 📸 Distribution :")
     crew = data.loc[data['id'] == selected_movie_id, 'cast'].values[0]
     actors = ast.literal_eval(crew) if isinstance(crew, str) else crew
     actor_cols = st.columns(5)  # Crée 5 colonnes pour les acteurs
@@ -154,8 +193,7 @@ with col3:  # Résumé et détails techniques
 ############################################### PARTIE BASSE ###################################################
 
 # Nos recommandations
-st.markdown("#### 📸 Nos recommandations")
-st.write(f"Films recommandés pour le film sélectionné : {selected_movie_title}")
+st.markdown(f"#### 📸 Nos recommandations pour '{selected_movie_title}'")
 voisins = recommend_movies(selected_movie_id, data, X_extended, pipeline)
 cols = st.columns(5)  # Création de 5 colonnes pour l'affichage en ligne
 for i, voisin in enumerate(voisins):
@@ -166,16 +204,16 @@ for i, voisin in enumerate(voisins):
             poster_url = "https://via.placeholder.com/200x300.png?text=Aucune+affiche"
 
         st.markdown(f"""
-            <div class="film-container" style="text-align: center; margin-bottom: 20px;">
-                <a href="/page4?movie_id={voisin['id']}" target="_self">
-                    <img src="{poster_url}" alt="{voisin['title']}" width="100" style="display:block; margin:auto;"/>
-                    <div class='film-name' style="color: black; text-decoration: none; margin-top: 10px;">
-                        {voisin['title']}
-                    </div>
+            <div class='movie-card'>
+                <a href="?movie_id={voisin['id']}" style="text-decoration: none; color: inherit;" target="_self">
+                <img src='{poster_url}' class='movie-poster'>
+                <p>{voisin['title']}</p>
+                <p class='movie-meta'>⭐ {voisin['note']:.1f}/10</p>
                 </a>
             </div>
-            """, unsafe_allow_html=True)
-
+        
+        """, unsafe_allow_html=True)
+        
 # Bande-annonce et avis
 col1, col2, col3 = st.columns([1, 1, 3])
 
@@ -186,3 +224,6 @@ with col1:
 with col3:
     st.markdown("#### 💬 Critique")
     st.markdown('**Aucun avis disponible**')
+
+
+st.markdown("</div>", unsafe_allow_html=True)
