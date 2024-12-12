@@ -58,13 +58,13 @@ selection = sac.steps(
 
 #Etape 1
 if selection == "Etape 1":
-    st.image("https://raw.githubusercontent.com/Damdam86/Recommandation_film/main/images/etape1.png")
+    st.image("images/etape1.png")
 
 
 #Etape 2
 elif selection == "Etape 2":
-    st.image("https://raw.githubusercontent.com/Damdam86/Recommandation_film/main/images/etape2.png")
-    st.image("https://raw.githubusercontent.com/Damdam86/Recommandation_film/main/images/etape3.png")
+    st.image("images/etape2.png")
+    st.image("images/etape3.png")
     st.title("Les requettes pour la création de la base avec IMDB")
     html_content = load_notebook_as_html(notebook_path)
     components.html(html_content, height=800, scrolling=True)

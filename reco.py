@@ -12,9 +12,6 @@ with open('style.css') as c:
     css = c.read()
 st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 
-# Insertion du CSS dans la page Streamlit
-st.markdown(css, unsafe_allow_html=True)
-
 # Récupérer les backdrops aléatoires
 backdrops = get_random_backdrops()
 
@@ -28,7 +25,7 @@ if backdrops:
         <div class="mySlides fade">
           <div class="numbertext">{i + 1} / {len(backdrops)}</div>
           <img src="{backdrop['url']}" style="width:100%; border-radius: 10px;">
-          <a href="/page4?movie_id={backdrop['id']}" style="text-decoration: none; color: inherit;">
+          <a href="/movie?movie_id={backdrop['id']}" style="text-decoration: none; color: inherit;">
           <div class="movie-title-big" style="position: absolute; bottom: 10px; left: 45%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.7); color: white; padding: 10px 20px; border-radius: 5px; text-align: center; font-size: 3rem; font-weight: bold;">
             {backdrop['title']}
           </div>
@@ -116,7 +113,7 @@ for i, movie in enumerate(random_movies):
         # Affichage du film avec titre et note
         st.markdown(f"""
             <div class='movie-card'>
-                <a href="/page4?movie_id={movie['id']}" style="text-decoration: none; color: inherit;" target="_self">
+                <a href="/movie?movie_id={movie['id']}" style="text-decoration: none; color: inherit;" target="_self">
                 <img src='{poster_url}' class='movie-poster'>
                 <p>{movie['title']}</p>
                 <p class='movie-meta'>⭐ {movie.get('vote_average', 'N/A')}/10</p>
@@ -193,7 +190,7 @@ if movies_top_rated:
             # Affichage du film
             st.markdown(f"""
                 <div class='movie-card'>
-                    <a href="/page4?movie_id={movie['id']}" style="text-decoration: none; color: inherit;" target="_self">
+                    <a href="/movie?movie_id={movie['id']}" style="text-decoration: none; color: inherit;" target="_self">
                     <img src='{poster_url}' class='movie-poster'>
                     <p>{movie_name}</p>
                     <p class='movie-meta'>⭐ {movie.get('vote_average', 'N/A')}/10</p>

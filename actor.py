@@ -23,7 +23,7 @@ actor_id = query_params.get("actor_id")
 
 
 # Ajouter le bouton "Retour" en utilisant le style "info-button"
-previous_page_url = "/page4"  # Remplace par l'URL de la page précédente si nécessaire
+previous_page_url = "/movie"  # Remplace par l'URL de la page précédente si nécessaire
 st.markdown(f"""
     <a href="{previous_page_url}" class="return-button" target="_self">← Retour</a>
 """, unsafe_allow_html=True)
