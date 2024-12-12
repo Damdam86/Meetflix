@@ -7,7 +7,7 @@ api_key = st.secrets['API_KEY']
 
 
 # Insertion du CSS dans la page Streamlit
-with open('./files/wave.css') as c:
+with open('style.css') as c:
     css = c.read()
 st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 

@@ -5,7 +5,7 @@ import streamlit_antd_components as sac
 import streamlit.components.v1 as components
 
 # Insertion du CSS dans la page Streamlit
-with open('./files/wave.css') as c:
+with open('style.css') as c:
     css = c.read()
 st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 
