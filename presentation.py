@@ -16,7 +16,7 @@ pages = [
     st.Page("page6.py", title="Full movies", icon="🎬"),
     st.Page("page4.py", title="Best movies", icon="🎬"),
     st.Page("page5.py", title="Acteurs", icon="🎭"),
-    st.Page("testpage.py", title="Test", icon="🎭"),
+    st.Page("prime_video_clone.py", title="Test", icon="🎭"),
 
 ]
 

@@ -5,8 +5,17 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 import requests
 import streamlit as st
+import random
+
 
 api_key = st.secrets['API_KEY']
+
+
+@st.cache_data
+def load_data():
+    file_path = 'https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'
+    df = pd.read_csv(file_path, sep=',')
+    return df
 
 # Chargement et préparation des données
 @st.cache_data
@@ -32,6 +41,7 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     return data, X_extended
 
 # Préparation du pipeline KNN
+@st.cache_data
 def create_and_train_pipeline(X_extended):
     # Préparation du pipeline pour le modèle KNN
     pipeline = Pipeline([
@@ -82,55 +92,68 @@ def recommend_movies(movie_id, data, X_extended, pipeline):
     return recommended_movies
 
 
-def recommend_movies_with_filters(pipeline, data, X_extended, genres=None, actors=None, min_duration=0, max_duration=300):
-    # Filtrer par genres si spécifiés
-    if genres:
-        data = data[data['genre_names'].apply(lambda x: any(genre in x for genre in genres))]
-    
-    # Filtrer par acteurs si spécifiés (nécessite une colonne 'actors' dans les données)
-    if actors and 'actors' in data.columns:
-        data = data[data['actors'].apply(lambda x: any(actor in x for actor in actors))]
-    
-    # Filtrer par durée si spécifiée
-    if 'runtime' in data.columns:
-        data = data[(data['runtime'] >= min_duration) & (data['runtime'] <= max_duration)]
-    
-    # Si le DataFrame est vide après filtrage, retourner une liste vide
-    if data.empty:
-        return []
-
-    # Ajouter les colonnes manquantes avec des zéros pour correspondre au pipeline
-    missing_columns = set(X_extended.columns) - set(data.columns)
-    for col in missing_columns:
-        data[col] = 0
-
-    # Réordonner les colonnes pour correspondre au pipeline
-    data = data[X_extended.columns]
-
-    # Obtenir les voisins les plus proches en utilisant KNN
-    distances, indices = pipeline.named_steps['knn'].kneighbors(
-        pipeline.named_steps['scaler'].transform(data[['vote_average', 'vote_count']])
-    )
-
-    # Récupérer les recommandations avec distances
-    recommended_movies = []
-    for idx, movie_index in enumerate(indices[0]):
-        movie = data.iloc[movie_index]
-        recommended_movies.append({
-            'id': movie['id'],
-            'title': movie['title'],
-            'poster_path': movie['poster_path'],
-            'vote_average': movie['vote_average'],
-            'distance': distances[0][idx]
-        })
-
-    return recommended_movies
-
-
-
-
 # Récupérer les détails d'un acteur
 def get_actors_info(actor_id):
     url = f"https://api.themoviedb.org/3/person/{actor_id}?language=fr-FR&api_key={api_key}"
     response = requests.get(url)
     return response.json()
+
+def get_random_backdrops():
+    try:
+        now_playing_url = f"https://api.themoviedb.org/3/movie/now_playing?language=fr-FR&page=1&api_key={api_key}"
+        response = requests.get(now_playing_url)
+        response.raise_for_status()
+        movies = response.json().get("results", [])
+        random_movies = random.sample(movies, min(len(movies), 5))  # Sélectionner jusqu'à 5 films aléatoires
+
+        backdrops = []
+        for movie in random_movies:
+            movie_id = movie["id"]
+            backdrops_url = f"https://api.themoviedb.org/3/movie/{movie_id}/images?include_image_language=fr,en&api_key={api_key}"
+            response = requests.get(backdrops_url)
+            response.raise_for_status()
+            images = response.json().get("backdrops", [])
+            #filtered_images = [img for img in images if img["aspect_ratio"] > 4]
+            if images:
+                backdrops.append({
+                    "url": f"https://image.tmdb.org/t/p/w1920_and_h427_multi_faces/{images[0]['file_path']}",
+                    "title": movie["title"],
+                    "id": movie["id"]
+                })
+        return backdrops
+    except Exception as e:
+        st.error(f"Erreur lors de la récupération des backdrops : {e}")
+        return []
+    
+# return a movie dataframe using the movie id
+def get_movie_with_id(df : pd.DataFrame, movie_id : int) -> pd.DataFrame :
+  return df[df["id"] == movie_id]
+
+# return a person dict using the person id
+def get_person_with_id(df: pd.DataFrame, person_id: int) -> dict:
+    for _, movie in df.iterrows():
+        cast = movie['cast']
+        if isinstance(cast, str):  # Convertir les chaînes JSON en liste de dictionnaires
+            cast = ast.literal_eval(cast)
+
+        if isinstance(cast, list):  # Vérifiez si c'est bien une liste
+            for person in cast:
+                if person['id'] == person_id:
+                    return person
+    return None  # Aucun acteur trouvé
+
+# return a dataframe of all the movie where a person appear in
+
+def get_movies_with_person_id(df: pd.DataFrame, person_id: int) -> pd.DataFrame:
+    df_movie = pd.DataFrame()
+    person = get_person_with_id(df, person_id)
+    if not person or 'known_for_titles' not in person or not isinstance(person['known_for_titles'], list):
+        return df_movie  # Retournez un DataFrame vide si la personne ou les titres sont invalides
+
+    for movie_id in person['known_for_titles']:
+        if df_movie.empty:
+            df_movie = get_movie_with_id(df, movie_id)
+        else:
+            df_movie = pd.concat([df_movie, get_movie_with_id(df, movie_id)], ignore_index=True)
+
+    return df_movie

@@ -8,8 +8,13 @@ data, X_extended = load_and_prepare_data()
 pipeline = create_and_train_pipeline(X_extended)
 
 # Récupérer le movie_id depuis l'URL
-query_params = st.experimental_get_query_params()  # Utilisation de experimental_get_query_params
-movie_id = query_params.get("movie_id", [None])[0]
+query_params = st.query_params  # Méthode mise à jour
+movie_id = query_params.get("movie_id")
+
+if isinstance(movie_id, list):  # Gérer le cas où c'est une liste
+    movie_id = movie_id[0]
+
+movie_id = int(movie_id) if movie_id else None  # Convertir ou None
 
 # CSS pour la page
 css = """
@@ -44,6 +49,25 @@ css = """
     color: white;
 }
 /* Buttons */
+.return-button {
+    position: relative;
+    top: 20px;
+    margin-bottom: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.return-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
 .play-button {
     background-color: #00a8e1;
     color: white;
@@ -121,10 +145,10 @@ css = """
 # Insertion du CSS dans la page Streamlit
 st.markdown(css, unsafe_allow_html=True)
 
-
-#page = st_navbar(["Accueil", "Documentation", "Examples", "Community", "About"])
-#st.write(page)
-
+previous_page_url = "/page4"  # Remplace par l'URL de la page précédente si nécessaire
+st.markdown(f"""
+    <a href="{previous_page_url}" class="return-button" target="_self">← Retour</a>
+""", unsafe_allow_html=True)
 
 ######################################## Affichage du film sélectionné ####################################################
 
@@ -134,10 +158,17 @@ selected_movie_id = int(movie_id) if movie_id else data.loc[data['title'] == st.
 selected_movie_title = data.loc[data['id'] == selected_movie_id, 'title'].values[0]
 
 ##################################### Titre de la page #####################################
+
+
 st.title(selected_movie_title)
+
+
 
 ######################################### Partie haute #####################################
 # Contenu principal avec deux colonnes
+# Ajouter le bouton "Retour" en utilisant le style "info-button"
+
+
 col1, col2, col3 = st.columns([1, 1, 3])
 image_width = 100  # Largeur de l'image en pixels
 
