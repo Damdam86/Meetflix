@@ -15,7 +15,49 @@ st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 # Récupérer les backdrops aléatoires
 backdrops = get_random_backdrops()
 
-# Afficher le carrousel
+
+######################################################################## BARRE DE NAVIGATION ########################################################################
+
+# Diviser l'affichage en deux colonnes
+col1, col2 = st.columns([1, 12])
+
+# Colonne 1 : Affichage du logo
+with col1:
+    st.image("https://github.com/Damdam86/Meetflix/blob/main/images/logo.png?raw=true", width=150)
+
+# Colonne 2 : Affichage du slider
+with col2:
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+
+    # Navigation haute
+    with col1:
+        st.markdown("""
+    <a href="/main" style="text-decoration: none;" target="_self">
+        <button class="button-navbar-haut">🛖 Accueil</button>
+    </a>
+    """, unsafe_allow_html=True)
+    with col2:
+        st.markdown("""
+    <a href="/movie" style="text-decoration: none;" target="_self">
+        <button class="button-navbar-haut">🎬 Les films</button>
+    </a>
+    """, unsafe_allow_html=True)
+    with col3:
+        st.markdown("""   
+    <a href="/main" style="text-decoration: none;" target="_self">
+        <button class="button-navbar-haut">👍 Les recommandations</button>
+    </a>
+    """, unsafe_allow_html=True)
+    with col4:
+        st.markdown("""
+    <a href="/search_movies" style="text-decoration: none;" target="_self">
+        <button class="button-navbar-haut">🔎 Rechercher</button>
+    </a>
+    """, unsafe_allow_html=True)
+
+###########################################################################################
+
+
 if backdrops:
     carousel_html = """
     <div class="slideshow-container">
@@ -23,12 +65,16 @@ if backdrops:
     for i, backdrop in enumerate(backdrops):
         carousel_html += f"""
         <div class="mySlides fade">
-          <div class="numbertext">{i + 1} / {len(backdrops)}</div>
-          <img src="{backdrop['url']}" style="width:100%; border-radius: 10px;">
-          <a href="/movie?movie_id={backdrop['id']}" style="text-decoration: none; color: inherit;">
-          <div class="movie-title-big" style="position: absolute; bottom: 10px; left: 45%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.7); color: white; padding: 10px 20px; border-radius: 5px; text-align: center; font-size: 3rem; font-weight: bold;">
+        <div class="numbertext">{i + 1} / {len(backdrops)}</div>
+        <!-- Image de fond -->
+        <img src="{backdrop['url']}" style="width:100%; border-radius: 10px;">
+        <!-- Lien et titre -->
+        <a href="/page4?movie_id={backdrop['id']}" style="text-decoration: none; color: inherit;">
+        <div class="movie-title-big" 
+                style="position: absolute; bottom: 150px; left: 25%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.7); color: white; padding: 10px 20px; border-radius: 5px; text-align: center; font-size: 3rem; font-weight: bold;">
             {backdrop['title']}
-          </div>
+        </div>
+        </a>
         </div>
         """
 
@@ -49,20 +95,20 @@ if backdrops:
     showSlides();
 
     function showSlides() {
-      let i;
-      let slides = document.getElementsByClassName("mySlides");
-      let dots = document.getElementsByClassName("dot");
-      for (i = 0; i < slides.length; i++) {
+        let i;
+        let slides = document.getElementsByClassName("mySlides");
+        let dots = document.getElementsByClassName("dot");
+        for (i = 0; i < slides.length; i++) {
         slides[i].style.display = "none";  
-      }
-      slideIndex++;
-      if (slideIndex > slides.length) {slideIndex = 1}    
-      for (i = 0; i < dots.length; i++) {
+        }
+        slideIndex++;
+        if (slideIndex > slides.length) {slideIndex = 1}    
+        for (i = 0; i < dots.length; i++) {
         dots[i].className = dots[i].className.replace(" active", "");
-      }
-      slides[slideIndex-1].style.display = "block";  
-      dots[slideIndex-1].className += " active";
-      setTimeout(showSlides, 7000); // Change image every 7 seconds
+        }
+        slides[slideIndex-1].style.display = "block";  
+        dots[slideIndex-1].className += " active";
+        setTimeout(showSlides, 7000); // Change image every 7 seconds
     }
     </script>
     """
@@ -71,7 +117,6 @@ if backdrops:
     st.components.v1.html(carousel_html, height=500)
 else:
     st.error("Aucun backdrop disponible pour afficher le carrousel.")
-
 
 # Chargement et préparation des données
 data, X_extended = load_and_prepare_data()

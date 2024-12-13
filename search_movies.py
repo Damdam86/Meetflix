@@ -45,6 +45,49 @@ def get_genres(api_key):
         genres = {genre["id"]: genre["name"] for genre in genres_data["genres"]}
         return genres
 
+
+######################################################################## BARRE DE NAVIGATION ########################################################################
+
+# Diviser l'affichage en deux colonnes
+col1, col2 = st.columns([1, 12])
+
+# Colonne 1 : Affichage du logo
+with col1:
+    st.image("https://github.com/Damdam86/Meetflix/blob/main/images/logo.png?raw=true", width=150)
+
+# Colonne 2 : Affichage du slider
+with col2:
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+
+    # Navigation haute
+    with col1:
+        st.markdown("""
+    <a href="/main" style="text-decoration: none;" target="_self">
+        <button class="button-navbar-haut">🛖 Accueil</button>
+    </a>
+    """, unsafe_allow_html=True)
+    with col2:
+        st.markdown("""
+    <a href="/movie" style="text-decoration: none;" target="_self">
+        <button class="button-navbar-haut">🎬 Les films</button>
+    </a>
+    """, unsafe_allow_html=True)
+    with col3:
+        st.markdown("""   
+    <a href="/main" style="text-decoration: none;" target="_self">
+        <button class="button-navbar-haut">👍 Les recommandations</button>
+    </a>
+    """, unsafe_allow_html=True)
+    with col4:
+        st.markdown("""
+    <a href="/search_movies" style="text-decoration: none;" target="_self">
+        <button class="button-navbar-haut">🔎 Rechercher</button>
+    </a>
+    """, unsafe_allow_html=True)
+
+###########################################################################################
+
+
 # Récupération des films
 genres = get_genres(api_key)  # Récupération des genres
 movies_list = get_movies()  # Récupération des films

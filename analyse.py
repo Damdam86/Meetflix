@@ -49,7 +49,7 @@ selection = sac.steps(
         sac.StepsItem(title='Etape 1', description="Etude, filtrage, fusion des données IMDB"),
         sac.StepsItem(title='Etape 2', description="Etude API TMDB, création de la nouvelle base"),
         sac.StepsItem(title='Etape 3', description="Statistique TMDB"),
-        sac.StepsItem(title='Etape 4', description="Algorythme de recommandation"),
+        sac.StepsItem(title='Etape 4', description="Algorythme de   "),
         sac.StepsItem(title='Etape 5', description="La base de données finale"),
     ], 
 )

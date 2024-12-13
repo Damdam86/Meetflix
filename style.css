@@ -105,6 +105,21 @@ header .logo {
     background-color: rgba(255, 255, 255, 0.2);
     color: white;
 }
+.button-navbar-haut {
+    background-color: #00050d;
+    font-size: 1.2rem;
+    text-align: right;
+    color: white;
+    border: none;
+    padding: 12px 80px;
+    cursor: pointer;
+    margin-right: 0rem;
+    margin-left : 1rem;
+}
+.button-navbar-haut:hover {
+    transform: scale(1.2
+    );
+}
 
 /* Movie Details */
 .movie-title {
