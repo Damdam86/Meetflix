@@ -1,6 +1,11 @@
 import streamlit as st
 import requests
 
+# Insertion du CSS dans la page Streamlit
+with open('style.css') as c:
+    css = c.read()
+st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
+
 # Clé API (remplacez par votre propre clé valide)
 api_key =st.secrets['API_KEY']
 
