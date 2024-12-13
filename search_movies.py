@@ -81,7 +81,7 @@ with col2:
     with col3:
         st.markdown("""   
     <a href="/actor" style="text-decoration: none;" target="_self">
-        <button class="button-navbar-haut">👍 Les acteurs</button>
+        <button class="button-navbar-haut">👨‍🎤 Les acteurs</button>
     </a>
     """, unsafe_allow_html=True)
     with col4:
