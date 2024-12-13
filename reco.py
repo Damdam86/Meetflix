@@ -32,7 +32,7 @@ with col2:
     # Navigation haute
     with col1:
         st.markdown("""
-    <a href="/main" style="text-decoration: none;" target="_self">
+    <a href="/reco" style="text-decoration: none;" target="_self">
         <button class="button-navbar-haut">🛖 Accueil</button>
     </a>
     """, unsafe_allow_html=True)
@@ -44,8 +44,8 @@ with col2:
     """, unsafe_allow_html=True)
     with col3:
         st.markdown("""   
-    <a href="/main" style="text-decoration: none;" target="_self">
-        <button class="button-navbar-haut">👍 Les recommandations</button>
+    <a href="/actor" style="text-decoration: none;" target="_self">
+        <button class="button-navbar-haut">👍 Les acteurs</button>
     </a>
     """, unsafe_allow_html=True)
     with col4:
