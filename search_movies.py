@@ -10,6 +10,7 @@ st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 api_key =st.secrets['API_KEY']
 
 # Fonction pour récupérer les films
+@st.cache_data
 def get_movies():
     base_url = f"https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=fr-FR&page=1&primary_release_date.gte=1950-01-01&primary_release_date.lte=2026-01-01&sort_by=popularity.desc&vote_average.gte=5&vote_average.lte=10&vote_count.gte=1000&with_runtime.gte=70&with_runtime.lte=300&api_key={api_key}"
     movies = []  # Liste pour stocker tous les films
@@ -41,7 +42,7 @@ def get_movies():
 
     return movies
 
-
+@st.cache_data
 def get_genres(api_key):
     url = f"https://api.themoviedb.org/3/genre/movie/list?language=fr-FR&api_key={api_key}"
     response = requests.get(url)
