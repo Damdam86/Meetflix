@@ -2,6 +2,8 @@ import streamlit as st
 import requests
 import ast
 from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies
+import df_tmdb_tool as dtt
+from data_manager import df_tmdb
 
 # Insertion du CSS dans la page Streamlit
 with open('style.css') as c:
@@ -61,7 +63,7 @@ col1, col2 = st.columns([1, 12])
 
 # Colonne 1 : Affichage du logo
 with col1:
-    st.image("https://github.com/Damdam86/Meetflix/blob/main/images/logo.png?raw=true", width=150)
+    st.image("images/logo.png", width=150)
 
 # Colonne 2 : Affichage du slider
 with col2:
@@ -95,55 +97,59 @@ with col2:
 
 ###########################################################################################
 
+# Initialiser la variable de session pour suivre combien de films afficher
+if "visible_movies" not in st.session_state:
+    st.session_state["visible_movies"] = 20  # Commencer avec 20 films visibles
 
 # Récupération des films
-genres = get_genres(api_key)  # Récupération des genres
-movies_list = get_movies()  # Récupération des films
+movies_list = df_tmdb 
+df_movie_filtered = df_tmdb 
 
-col1, col2 = st.columns([1, 1])
+genres = dtt.get_all_genre_names()  # Récupération des genres
 
-with col1:
-    # Filtrage par genre
-    selected_genre_name = st.selectbox("Filtrez par genre :", ["Tous"] + list(genres.values()))
-    selected_genre_id = None if selected_genre_name == "Tous" else [k for k, v in genres.items() if v == selected_genre_name][0]
+most_older_year = dtt.get_most_older_year(movies_list)
+most_recent_year = dtt.get_most_recent_year(movies_list)
 
-    # Filtrage par acteurs (en cours)
-    #selected_genre_name = st.selectbox("Filtrez par acteur :", ["Tous"] + list(actors.values()))
-    #selected_genre_id = None if selected_actors_name == "Tous" else [k for k, v in actors.items() if v == selected_actors_name][0]
+min_vote_average = dtt.get_min_vote_average(movies_list)
+max_vote_average = dtt.get_max_vote_average(movies_list)
+
+selected_genre = st.multiselect("Filtrez par genre :", genres)
+
+selected_year = st.slider("Sélectionner une plage d'années", most_older_year, most_recent_year, (most_older_year, most_recent_year))
+
+selected_vote_average = st.slider("Sélectionner une plage de vote", min_vote_average, max_vote_average, (min_vote_average, max_vote_average))
 
 
-    # Filtrer les films par genre sélectionné
-    if selected_genre_id:
-        filtered_movies = [movie for movie in movies_list if selected_genre_id in movie["genre_ids"]]
-    else:
-        filtered_movies = movies_list
+if selected_genre or selected_year or selected_vote_average:
+    df_movie_filtered = dtt.get_filtered_df(movies_list, genres = selected_genre, min_year = selected_year[0], max_year = selected_year[1], min_vote_average = selected_vote_average[0], max_vote_average = selected_vote_average[1])
 
-    # Initialiser la variable de session pour suivre combien de films afficher
-    if "visible_movies" not in st.session_state:
-        st.session_state["visible_movies"] = 20  # Commencer avec 20 films visibles
+# Limiter l'affichage au nombre défini par `visible_movies`
+visible_movies = st.session_state["visible_movies"]
+column_number_page = 5
 
-    # Bouton "Afficher plus"
-    if st.button("Afficher plus"):
-        st.session_state["visible_movies"] += 20  # Augmenter de 20 films
+nb_line = int(visible_movies/column_number_page)+1
 
-    # Limiter l'affichage au nombre défini par `visible_movies`
-    visible_movies = st.session_state["visible_movies"]
 
-with col2:
-    selected_genre_name = st.selectbox("Filtrez par mot clés :", ["Tous"] + list(genres.values()))
+film = 0
+for line in range(0,nb_line,1):
+        cols = st.columns(column_number_page)
+        for col in cols:
+            if film >= visible_movies:
+                break
+            with col:
+                movie = df_movie_filtered.iloc[film]
+                #st.markdown(f"**{movie['title']}**")
+                if movie["poster_path"]:
+                    st.markdown(f"""
+                    <div class='movie-card'>
+                        <a href="movie?movie_id={movie['id']}" style="text-decoration: none; color: inherit;" target="_self";>
+                        <img src='https://image.tmdb.org/t/p/w200{movie['poster_path']}' class='movie-poster'>
+                        <p>{movie['title']}</p>
+                        </a>
+                    </div>
+                """, unsafe_allow_html=True)
+            film += 1
+# Bouton "Afficher plus"
+if st.button("Afficher plus"):
+    st.session_state["visible_movies"] += 20  # Augmenter de 20 films
 
-# Afficher les films sous forme de vignettes
-columns = st.columns(5)  # 5 colonnes
-for i, movie in enumerate(filtered_movies[:visible_movies]):  # Utiliser `filtered_movies`
-    col = columns[i % 5]  # Répartir les films dans les colonnes
-    with col:
-        st.markdown(f"**{movie['title']}**")
-        if movie["poster_path"]:
-            st.markdown(f"""
-            <div class='movie-card'>
-                <a href="movie?movie_id={movie['id']}" style="text-decoration: none; color: inherit;" target="_self">
-                <img src='https://image.tmdb.org/t/p/w200{movie['poster_path']}' class='movie-poster'>
-                <p>{movie['title']}</p>
-                </a>
-            </div>
-        """, unsafe_allow_html=True)
