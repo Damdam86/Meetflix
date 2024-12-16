@@ -100,24 +100,6 @@ with col2:
 genres = get_genres(api_key)  # Récupération des genres
 movies_list = get_movies()  # Récupération des films
 
-# Questions avec feedback
-st.markdown("Note de 0 à 5 :")
-
-st.markdown("Je prefère les films qui se déroulent dans des univers imaginaires ou fantastiques")
-fantastic_imaginaire = st.feedback(options="stars", key="fantastic_slider", disabled=False, on_change=None, args=None, kwargs=None)
-
-st.markdown("Les comédies font partie de mes genres préférés")
-comedie = st.feedback(options="stars", key="comedie", disabled=False, on_change=None, args=None, kwargs=None)
-
-st.markdown("Je prefère un film avec beaucoup d'action à un film plus lent et contemplatif")
-action_lent = st.feedback(options="stars", key="action_lent", disabled=False, on_change=None, args=None, kwargs=None)
-
-st.markdown("Les documentaires m’intéressent autant que les films de fiction")
-doc_fiction = st.feedback(options="stars", key="doc_fiction", disabled=False, on_change=None, args=None, kwargs=None)
-
-st.markdown("J'évite les films avec des scènes trop violentes ou effrayantes")
-violent = st.feedback(options="stars", key="violent", disabled=False, on_change=None, args=None, kwargs=None)
-
 # Filtrage par genre
 selected_genre_name = st.selectbox("Filtrez par genre :", ["Tous"] + list(genres.values()))
 selected_genre_id = None if selected_genre_name == "Tous" else [k for k, v in genres.items() if v == selected_genre_name][0]
