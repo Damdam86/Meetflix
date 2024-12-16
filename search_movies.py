@@ -141,7 +141,7 @@ for i, movie in enumerate(filtered_movies[:visible_movies]):  # Utiliser `filter
         if movie["poster_path"]:
             st.markdown(f"""
             <div class='movie-card'>
-                <a href="?movie_id={movie['id']}" style="text-decoration: none; color: inherit;" target="_self">
+                <a href="movie?movie_id={movie['id']}" style="text-decoration: none; color: inherit;" target="_self">
                 <img src='https://image.tmdb.org/t/p/w200{movie['poster_path']}' class='movie-poster'>
                 <p>{movie['title']}</p>
                 </a>
