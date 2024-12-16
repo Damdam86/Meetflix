@@ -100,32 +100,37 @@ with col2:
 genres = get_genres(api_key)  # Récupération des genres
 movies_list = get_movies()  # Récupération des films
 
-# Filtrage par genre
-selected_genre_name = st.selectbox("Filtrez par genre :", ["Tous"] + list(genres.values()))
-selected_genre_id = None if selected_genre_name == "Tous" else [k for k, v in genres.items() if v == selected_genre_name][0]
+col1, col2 = st.columns([1, 1])
 
-# Filtrage par acteurs (en cours)
-#selected_genre_name = st.selectbox("Filtrez par acteur :", ["Tous"] + list(actors.values()))
-#selected_genre_id = None if selected_actors_name == "Tous" else [k for k, v in actors.items() if v == selected_actors_name][0]
+with col1:
+    # Filtrage par genre
+    selected_genre_name = st.selectbox("Filtrez par genre :", ["Tous"] + list(genres.values()))
+    selected_genre_id = None if selected_genre_name == "Tous" else [k for k, v in genres.items() if v == selected_genre_name][0]
+
+    # Filtrage par acteurs (en cours)
+    #selected_genre_name = st.selectbox("Filtrez par acteur :", ["Tous"] + list(actors.values()))
+    #selected_genre_id = None if selected_actors_name == "Tous" else [k for k, v in actors.items() if v == selected_actors_name][0]
 
 
-# Filtrer les films par genre sélectionné
-if selected_genre_id:
-    filtered_movies = [movie for movie in movies_list if selected_genre_id in movie["genre_ids"]]
-else:
-    filtered_movies = movies_list
+    # Filtrer les films par genre sélectionné
+    if selected_genre_id:
+        filtered_movies = [movie for movie in movies_list if selected_genre_id in movie["genre_ids"]]
+    else:
+        filtered_movies = movies_list
 
-# Initialiser la variable de session pour suivre combien de films afficher
-if "visible_movies" not in st.session_state:
-    st.session_state["visible_movies"] = 20  # Commencer avec 20 films visibles
+    # Initialiser la variable de session pour suivre combien de films afficher
+    if "visible_movies" not in st.session_state:
+        st.session_state["visible_movies"] = 20  # Commencer avec 20 films visibles
 
-# Bouton "Afficher plus"
-if st.button("Afficher plus"):
-    st.session_state["visible_movies"] += 20  # Augmenter de 20 films
+    # Bouton "Afficher plus"
+    if st.button("Afficher plus"):
+        st.session_state["visible_movies"] += 20  # Augmenter de 20 films
 
-# Limiter l'affichage au nombre défini par `visible_movies`
-visible_movies = st.session_state["visible_movies"]
+    # Limiter l'affichage au nombre défini par `visible_movies`
+    visible_movies = st.session_state["visible_movies"]
 
+with col2:
+    selected_genre_name = st.selectbox("Filtrez par mot clés :", ["Tous"] + list(genres.values()))
 
 # Afficher les films sous forme de vignettes
 columns = st.columns(5)  # 5 colonnes
