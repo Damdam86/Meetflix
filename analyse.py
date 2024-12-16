@@ -49,7 +49,7 @@ selection = sac.steps(
         sac.StepsItem(title='Etape 1', description="Etude, filtrage, fusion des données IMDB"),
         sac.StepsItem(title='Etape 2', description="Etude API TMDB, création de la nouvelle base"),
         sac.StepsItem(title='Etape 3', description="Statistique TMDB"),
-        sac.StepsItem(title='Etape 4', description="Algorythme de   "),
+        sac.StepsItem(title='Etape 4', description="Algorythmes de recommandation"),
         sac.StepsItem(title='Etape 5', description="La base de données finale"),
     ], 
 )
@@ -59,31 +59,31 @@ selection = sac.steps(
 #Etape 1
 if selection == "Etape 1":
     st.image("images/etape1.png")
-
-
-#Etape 2
-elif selection == "Etape 2":
     st.image("images/etape2.png")
     st.image("images/etape3.png")
     st.title("Les requettes pour la création de la base avec IMDB")
     html_content = load_notebook_as_html(notebook_path)
     components.html(html_content, height=800, scrolling=True)
 
-#Etape 3
-elif selection == "Etape 3":
-    st.title("Les requettes pour la création de la base avec TMDB et l'API")
+#Etape 2
+elif selection == "Etape 2":
+    st.title("Choix de se focaliser uniquement sur IMDB")
+    st.text("Aprés étude de la base TMDB, l'ensemble des infos sont requétable par API. Nous avons donc décidé de constituer une nouvelle base uniquement à partir des données de TMDB")
+    st.title("Les requettes pour la création de la base avec TMDB")
     html_content = load_notebook_as_html(notebook_path)
     components.html(html_content, height=800, scrolling=True)
+    
 
-#Etape 4
-elif selection == "Etape 4":
+#Etape 3
+elif selection == "Etape 3":
+    st.title("Statistique TMDB")
     fig1 = px.histogram(
-        df, 
-        x='vote_count', 
-        nbins=20, 
-        title='Distribution du nbre de vote par film',
-        labels={'vote_count': 'Vote Count'}
-    )
+    df, 
+    x='vote_count', 
+    nbins=20, 
+    title='Distribution du nbre de vote par film',
+    labels={'vote_count': 'Vote Count'}
+)
 
     fig2 = px.histogram(
         df, 
@@ -104,7 +104,7 @@ elif selection == "Etape 4":
         color_continuous_scale='viridis',
         title='Films les plus appréciés'
     )
-    
+
     #scatter plot des votes vs notes
     fig4 = px.scatter(df, x='vote_count', y='vote_average', hover_data=['title'], title='Votes vs Notes')
 
@@ -119,6 +119,20 @@ elif selection == "Etape 4":
     with col2:
         st.plotly_chart(fig2, use_container_width=True)
         st.plotly_chart(fig4, use_container_width=True)
+
+#Etape 4
+elif selection == "Etape 4":
+    st.title("Le système de recommandation")
+    st.text("Nous avons fait le choix de partir sur plusieurs solutions de recommandation.")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.title("KNN")
+        st.text("Nous avons fait le choix de partir sur plusieurs solutions de recommandation.")
+
+    with col2:
+        st.title("BERT")
+        st.text("Nous avons fait le choix de partir sur plusieurs solutions de recommandation.")
 
 #Etape 5
 elif selection == "Etape 5":
