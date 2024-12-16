@@ -1,5 +1,7 @@
 import streamlit as st
 import requests
+import ast
+from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies
 
 # Insertion du CSS dans la page Streamlit
 with open('style.css') as c:
@@ -120,6 +122,11 @@ violent = st.feedback(options="stars", key="violent", disabled=False, on_change=
 selected_genre_name = st.selectbox("Filtrez par genre :", ["Tous"] + list(genres.values()))
 selected_genre_id = None if selected_genre_name == "Tous" else [k for k, v in genres.items() if v == selected_genre_name][0]
 
+# Filtrage par acteurs (en cours)
+#selected_genre_name = st.selectbox("Filtrez par acteur :", ["Tous"] + list(actors.values()))
+#selected_genre_id = None if selected_actors_name == "Tous" else [k for k, v in actors.items() if v == selected_actors_name][0]
+
+
 # Filtrer les films par genre sélectionné
 if selected_genre_id:
     filtered_movies = [movie for movie in movies_list if selected_genre_id in movie["genre_ids"]]
@@ -137,6 +144,7 @@ if st.button("Afficher plus"):
 # Limiter l'affichage au nombre défini par `visible_movies`
 visible_movies = st.session_state["visible_movies"]
 
+
 # Afficher les films sous forme de vignettes
 columns = st.columns(5)  # 5 colonnes
 for i, movie in enumerate(filtered_movies[:visible_movies]):  # Utiliser `filtered_movies`
@@ -144,7 +152,11 @@ for i, movie in enumerate(filtered_movies[:visible_movies]):  # Utiliser `filter
     with col:
         st.markdown(f"**{movie['title']}**")
         if movie["poster_path"]:
-            st.image(
-                f"https://image.tmdb.org/t/p/w200{movie['poster_path']}",
-                width=120  # Ajuster la largeur des images
-            )
+            st.markdown(f"""
+            <div class='movie-card'>
+                <a href="?movie_id={movie['id']}" style="text-decoration: none; color: inherit;" target="_self">
+                <img src='https://image.tmdb.org/t/p/w200{movie['poster_path']}' class='movie-poster'>
+                <p>{movie['title']}</p>
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
