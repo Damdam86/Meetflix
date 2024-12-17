@@ -1,6 +1,12 @@
 .stApp {
     background-color: #00050d;
     color: white;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+h1, h2, h3, h4, h5, h6, p {
+    margin-top: 0.5rem; /* Réduit l'espacement supérieur */
+    margin-bottom: 0.5rem; /* Réduit l'espacement inférieur */
 }
 :root {
     --background-color: #00050d;
@@ -25,10 +31,11 @@ body {
 }
 .block-container
 {
-    padding-top: 2rem;
+    padding-top: 3rem;
     padding-bottom: 0rem;
-    margin-top: 1rem;
+    margin-top: 0rem;
 }
+
 /* Navigation */
 .button-navbar-haut {
     background-color: #00050d;
@@ -62,6 +69,7 @@ body {
 .movie-card {
     cursor: pointer;
     transition: transform 0.2s;
+    margin-bottom: 2rem;
 }
 .movie-card:hover {
     transform: scale(1.05);
@@ -116,4 +124,43 @@ body {
 /* Recommendations */
 .recommendations {
     margin-top: 3rem;
+}
+
+
+/* Réduction des marges et padding globaux */
+.slideshow-container {
+    margin: 0 auto; /* Centre le carrousel sans marges supplémentaires */
+    padding: 0;
+    position: relative; /* Ajuste l'espace du conteneur */
+    width: 100%;
+    max-width: 100%;
+}
+.mySlides img {
+    width: 100%;
+    height: auto;
+    border-radius: 20px; /* Garde les bords arrondis */
+    display: block;
+}
+.movie-title-big {
+    position: absolute;
+    bottom: 20px; /* Ajuste la position pour coller plus près de l'image */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 2rem; /* Réduit légèrement la taille */
+    font-weight: bold;
+    margin: 0;
+}
+.dot {
+    height: 10px;
+    width: 10px;
+    margin: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
 }

@@ -67,7 +67,7 @@ if backdrops:
         <div class="mySlides fade">
         <div class="numbertext">{i + 1} / {len(backdrops)}</div>
         <!-- Image de fond -->
-        <img src="{backdrop['url']}" style="width:100%; border-radius: 10px;">
+        <img src="{backdrop['url']}" style="width:100%; border-radius: 20px;">
         <!-- Lien et titre -->
         <a href="/page4?movie_id={backdrop['id']}" style="text-decoration: none; color: inherit;">
         <div class="movie-title-big" 
