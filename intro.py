@@ -32,12 +32,11 @@ def main():
 
         # Transition après lecture de la vidéo
         if "video_played" not in st.session_state:
-            time.sleep(7)  # Temps 
+            time.sleep(7)  # Temps avant redirection
             st.session_state["video_played"] = True
 
-            # Chargement des données
+            # Chargement de toutes les fonctions possibles
             load_functions()
-            st.session_state["page"] = "reco"
 
             # Redirection vers la page reco.py
             st.switch_page("reco.py")

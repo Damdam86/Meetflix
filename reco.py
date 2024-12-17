@@ -140,7 +140,6 @@ movies_top_rated = response2.json().get("results", [])
 # Sélectionner 5 films aléatoires
 random_movies = random.sample(movies, min(len(movies), 5))
 
-
 st.markdown("# Les films actuellement au cinéma")
 
 # Création de 5 colonnes pour l'affichage
@@ -182,6 +181,18 @@ with col1:
     # Récupérer l'ID du film sélectionné
     selected_movie_id = data[data['title'] == selected_movie_title]['id'].values[0]
 
+    if selected_movie_id is not None:
+        st.markdown(
+            f"""
+            <a href="/movie?movie_id={selected_movie_id}" target="_self">
+                <button style="background-color: #317AC1; color: white; border-radius: 10px; padding: 10px; cursor: pointer;">
+                    Recommander des films similaires
+                </button>
+            </a>
+            """,
+            unsafe_allow_html=True
+        )
+
 with col2:  # Colonne de séparation
     st.text("")
 
@@ -201,23 +212,6 @@ with col3:
 
 # Diviser les recommandations en colonnes pour une meilleure lisibilité
 cols = st.columns(5)  # Création de 5 colonnes pour l'affichage en ligne
-
-if selected_movie_id is not None and st.button("Recommander des films similaires"):
-    st.write(f"Films recommandés pour le film sélectionné : {selected_movie_title}")
-    voisins = recommend_movies(selected_movie_id, data, X_extended, pipeline)
-    for i, voisin in enumerate(voisins):
-        with cols[i % 5]:  # Répartir les films dans les colonnes de manière circulaire
-            # Si le poster est disponible
-            if voisin['poster']:
-                poster_url = f"https://image.tmdb.org/t/p/w500{voisin['poster']}"
-            else:
-                poster_url = "https://via.placeholder.com/200x300.png?text=Aucune+affiche"
-
-            # Affichage des détails du film
-            st.image(poster_url, width=100, caption=voisin['title'])
-            st.write(f"Distance : {voisin['distance']:.2f}")
-            st.write(f"Note : {voisin['note']}")
-
 
 # Création de 5 colonnes pour l'affichage
 st.markdown("# Les films les plus populaires")

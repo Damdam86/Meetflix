@@ -71,15 +71,11 @@ selected_movie_title = data.loc[data['id'] == selected_movie_id, 'title'].values
 
 ##################################### Titre de la page #####################################
 
-
 st.title(selected_movie_title)
-
-
 
 ######################################### Partie haute #####################################
 # Contenu principal avec deux colonnes
 # Ajouter le bouton "Retour" en utilisant le style "info-button"
-
 
 col1, col2, col3 = st.columns([1, 1, 3])
 image_width = 100  # Largeur de l'image en pixels
@@ -107,7 +103,7 @@ with col2:  # Informations principales
    # Buttons
     st.markdown("""
     <button class='play-button'>▶ Voir le film</button>
-    <button class='info-button'>+ Ajouter aux favoris</button>
+    <br><br><button class='info-button'>+ Ajouter aux favoris</button>
     """, unsafe_allow_html=True)
     st.markdown(f"**A voir sur :** ")
 
