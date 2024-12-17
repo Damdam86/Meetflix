@@ -32,25 +32,25 @@ with col2:
     # Navigation haute
     with col1:
         st.markdown("""
-    <a href="/reco" style="text-decoration: none;" target="_self">
+    <br><a href="/reco" style="text-decoration: none;" target="_self">
         <button class="button-navbar-haut">🛖 Accueil</button>
     </a>
     """, unsafe_allow_html=True)
     with col2:
         st.markdown("""
-    <a href="/movie" style="text-decoration: none;" target="_self">
+    <br><a href="/movie" style="text-decoration: none;" target="_self">
         <button class="button-navbar-haut">🎬 Les films</button>
     </a>
     """, unsafe_allow_html=True)
     with col3:
         st.markdown("""   
-    <a href="/actor" style="text-decoration: none;" target="_self">
+    <br><a href="/actor" style="text-decoration: none;" target="_self">
         <button class="button-navbar-haut">👨‍🎤 Les acteurs</button>
     </a>
     """, unsafe_allow_html=True)
     with col4:
         st.markdown("""
-    <a href="/search_movies" style="text-decoration: none;" target="_self">
+    <br><a href="/search_movies" style="text-decoration: none;" target="_self">
         <button class="button-navbar-haut">🔎 Rechercher</button>
     </a>
     """, unsafe_allow_html=True)
