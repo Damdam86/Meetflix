@@ -25,3 +25,6 @@ api_key = "192f96229b83ef4a1fa6add55531870f"
 
 [client]
 showSidebarNavigation = false
+
+[ui]
+hideTopBar = true
