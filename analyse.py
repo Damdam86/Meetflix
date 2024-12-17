@@ -27,11 +27,6 @@ def load_notebook_as_html(notebook_path):
     (body, _) = html_exporter.from_notebook_node(notebook)
     return body
 
-# Insertion du CSS dans la page Streamlit
-with open('style.css') as c:
-    css = c.read()
-st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
-
 # Titre de la page
 st.markdown("""
 <div class="banner">

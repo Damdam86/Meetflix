@@ -1,10 +1,10 @@
 import streamlit as st
+import pandas as pd
+import ast
 import requests
 from fonctions import get_actors_info, get_movie_with_id, get_person_with_id, get_movies_with_person_id, load_data
 # Clé API pour TMDb
 api_key = st.secrets['API_KEY']
-
-
 
 # Insertion du CSS dans la page Streamlit
 with open('style.css') as c:
@@ -55,32 +55,48 @@ with col2:
 
 ######################################## DEBUT PAGE ####################################################
 
-# Récupération des paramètres de l'URL pour obtenir l'ID de l'acteur
+# Récupérer le movie_id depuis l'URL
 query_params = st.query_params  # Méthode mise à jour
 actor_id = query_params.get("actor_id")
 
-
-if isinstance(actor_id, list):  # Gérer le cas où c'est une liste
-    actor_id = actor_id[0]
-
-actor_id = int(actor_id) if actor_id else None  # Convertir ou None
-
-# Vérifier si l'ID de l'acteur est valide
-if actor_id is None or actor_id == "None":
-    st.error("Aucun acteur sélectionné.")
-else:
-    # Convertir l'ID en entier si nécessaire (certaines APIs peuvent le nécessiter)
+if actor_id:
     try:
         actor_id = int(actor_id)
     except ValueError:
-        st.error("ID de l'acteur non valide.")
-        st.stop()
+        actor_id = None
 
+# Vérifier si l'ID de l'acteur est valide
+if actor_id is None:
+    st.markdown("### 👨‍🎤 Liste des acteurs disponibles")
+    
+    # Charger les données des films
+    df = load_data()
+    
+    # Extraire tous les acteurs uniques à partir de la colonne "cast"
+    all_cast = []
+    for cast_list in df['cast']:
+        if isinstance(cast_list, str):  # Vérifier que la donnée est une chaîne JSON
+            cast = ast.literal_eval(cast_list)
+            all_cast.extend(cast)
+    
+    # Créer un DataFrame des acteurs uniques
+    df_cast = pd.DataFrame(all_cast).drop_duplicates(subset='id', keep='first')
+    actor_names = df_cast['name'].tolist()
+    
+    # Affichez une liste déroulante pour sélectionner un acteur
+    selected_actor_name = st.selectbox("Choisissez un acteur :", ["Sélectionnez un acteur"] + actor_names)
+    
+    if selected_actor_name != "Sélectionnez un acteur":
+        selected_actor_id = df_cast.loc[df_cast['name'] == selected_actor_name, 'id'].values[0]
+        st.experimental_set_query_params(actor_id=selected_actor_id)
+        st.experimental_rerun()
+    else:
+        st.warning("Veuillez sélectionner un acteur pour voir ses détails.")
+else:
     # Récupérer les détails de l'acteur sélectionné
     df = load_data()
     actor_details = get_actors_info(actor_id)
     df_movies = get_movies_with_person_id(df, actor_id).head(10)
-
 
     # Vérifier que les détails de l'acteur ont été correctement récupérés
     if actor_details is None or "status_code" in actor_details:
@@ -108,27 +124,5 @@ else:
         with col3:
             st.markdown(f"**Biographie :** {actor_details.get('biography', 'Biographie non disponible')}")
 
-
-st.markdown("#### 🎥 Films de l'acteur :")
-movie_cols = st.columns(5)  # Crée 5 colonnes pour afficher les films
-    
-for i, (_, movie) in enumerate(df_movies.iterrows()):
-    with movie_cols[i % 5]:  # Répartir les films dans les colonnes
-        movie_poster = movie.get("poster_path")
-        movie_title = movie.get("title", "Titre inconnu")
-        movie_id = movie.get("id")
-
-        # Affichage de l'affiche et du titre
-        if movie_poster:
-            poster_url = f"https://image.tmdb.org/t/p/original/{movie_poster}"
-        else:
-            poster_url = "https://via.placeholder.com/200x300.png?text=Aucune+affiche"
-
-        st.markdown(f"""
-        <div class="movie-card">
-            <a href="/movie?movie_id={movie_id}" style="text-decoration: none; color: inherit;" target="_self">
-            <img src="{poster_url}" class="movie-poster">
-            <p>{movie_title}</p>
-            </a>
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown("#### 🎥 Films de l'acteur :")
+    movie_cols = st.columns(5)  # Crée 5 colonnes
