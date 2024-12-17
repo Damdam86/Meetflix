@@ -18,7 +18,7 @@ runOnSave = true                        # Redémarrer l'application automatiquem
 # Mise en page
 [layout]
 wideMode = true                         # Pleine largeur
-initialSidebarState = "expanded"        # Barre latérale toujours visible
+initialSidebarState = "collapsed"        # Barre latérale toujours visible
 
 #API
 api_key = "192f96229b83ef4a1fa6add55531870f"
