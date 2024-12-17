@@ -13,6 +13,7 @@ with open('style.css') as c:
     css = c.read()
 st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 
+actor_dico = pd.DataFrame(person_dico.values())
 
 ######################################################################## BARRE DE NAVIGATION ########################################################################
 
@@ -89,55 +90,45 @@ if actor_id is None:
     else:
         st.warning("Veuillez sélectionner un acteur pour voir ses détails.")
 else:
+    # Chargement des données des films
+    df_movies_full = load_data()  # Chargement des films
+    df_movies = get_movies_with_person_id(df_movies_full, actor_dico, actor_id).head(10)  # Passer actor_dico
     # Récupérer les détails de l'acteur sélectionné
-    df = load_data()
-    actor_details = get_actors_info(actor_id)
-    df_movies = get_movies_with_person_id(df, actor_id).head(10)
+    actor_details = get_person_with_id(actor_dico, actor_id)    
 
     # Vérifier que les détails de l'acteur ont été correctement récupérés
-    if actor_details is None or "status_code" in actor_details:
+    if actor_details is None:
         st.error("Impossible de récupérer les détails de l'acteur. Veuillez vérifier l'ID.")
     else:
-        # Affichage des informations détaillées de l'acteur sélectionné
         st.title(actor_details.get("name", "Nom inconnu"))
 
         # Afficher l'image de l'acteur
-        image_width = 300  # Largeur de l'image en pixels
-
-        col1, col2, col3 = st.columns([2,1,12])
-
+        col1, col3 = st.columns([2, 3])
         with col1:
             profile_path = actor_details.get("profile_path")
             if profile_path:
-                st.image(f"https://image.tmdb.org/t/p/original/{profile_path}", 
-                         caption=actor_details.get("name", "Nom inconnu"), 
-                         width=image_width)
-            st.markdown(f"**Date de naissance :** {actor_details.get('birthday', 'Date non spécifiée')}")
+                st.image(f"https://image.tmdb.org/t/p/original/{profile_path}", width=300)
+            st.markdown(f"**Date de naissance :** {actor_details.get('birthday', 'Non spécifiée')}")
             st.markdown(f"**Lieu de naissance :** {actor_details.get('place_of_birth', 'Non spécifié')}")
 
         with col3:
             st.markdown(f"**Biographie :** {actor_details.get('biography', 'Biographie non disponible')}")
 
-    # Affichage des films
-    st.markdown("#### 🎥 Films de l'acteur :")
-    movie_cols = st.columns(5)  # Crée 5 colonnes
-    for i, (_, movie) in enumerate(df_movies.iterrows()):
-        with movie_cols[i % 5]:  # Répartir les films dans les colonnes
-            movie_poster = movie.get("poster_path")
-            movie_title = movie.get("title", "Titre inconnu")
-            movie_id = movie.get("id")
-
-            # Affichage de l'affiche et du titre
-            if movie_poster:
-                poster_url = f"https://image.tmdb.org/t/p/original/{movie_poster}"
-            else:
-                poster_url = "https://via.placeholder.com/200x300.png?text=Aucune+affiche"
-
-            st.markdown(f"""
-            <div class="movie-card">
-                <a href="/movie?movie_id={movie_id}" style="text-decoration: none; color: inherit;" target="_self">
-                <img src="{poster_url}" class="movie-poster">
-                <p>{movie_title}</p>
-                </a>
-            </div>
-            """, unsafe_allow_html=True)
+        # Affichage des films
+        st.markdown("#### 🎥 Films de l'acteur :")
+        if df_movies.empty:
+            st.info("Aucun film trouvé pour cet acteur.")
+        else:
+            movie_cols = st.columns(5)
+            for i, (_, movie) in enumerate(df_movies.iterrows()):
+                with movie_cols[i % 5]:
+                    poster_url = f"https://image.tmdb.org/t/p/original/{movie.get('poster_path', '')}"
+                    movie_title = movie.get("title", "Titre inconnu")
+                    movie_id = movie.get("id")
+                    st.markdown(f"""
+                    <div class='movie-card'>
+                    <a href="/movie?movie_id={movie_id}" style="text-decoration: none; color: inherit;" target="_self">
+                        <img src="{poster_url}" style="width: 150px; height: 225px; border-radius: 10px;">
+                        <p>{movie_title}</p>
+                    </div>
+                    """, unsafe_allow_html=True)

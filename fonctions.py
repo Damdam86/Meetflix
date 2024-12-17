@@ -130,30 +130,30 @@ def get_movie_with_id(df : pd.DataFrame, movie_id : int) -> pd.DataFrame :
   return df[df["id"] == movie_id]
 
 # return a person dict using the person id
-def get_person_with_id(df: pd.DataFrame, person_id: int) -> dict:
-    for _, movie in df.iterrows():
-        cast = movie['cast']
-        if isinstance(cast, str):  # Convertir les chaînes JSON en liste de dictionnaires
-            cast = ast.literal_eval(cast)
-
-        if isinstance(cast, list):  # Vérifiez si c'est bien une liste
-            for person in cast:
-                if person['id'] == person_id:
-                    return person
+def get_person_with_id(actor_dico: pd.DataFrame, person_id: int) -> dict:
+    """
+    Retourne un dict contenant les informations d'une personne selon son ID.
+    """
+    person = actor_dico.loc[actor_dico['id'] == person_id]
+    if not person.empty:
+        return person.iloc[0].to_dict()  # Retourne les détails sous forme de dictionnaire
     return None  # Aucun acteur trouvé
 
-# return a dataframe of all the movie where a person appear in
 
-def get_movies_with_person_id(df: pd.DataFrame, person_id: int) -> pd.DataFrame:
-    df_movie = pd.DataFrame()
-    person = get_person_with_id(df, person_id)
+def get_movies_with_person_id(df: pd.DataFrame, actor_dico: pd.DataFrame, person_id: int) -> pd.DataFrame:
+    """
+    Retourne un DataFrame des films associés à une personne selon son ID.
+    """
+    # Récupérer les informations de la personne
+    person = get_person_with_id(actor_dico, person_id)
     if not person or 'known_for_titles' not in person or not isinstance(person['known_for_titles'], list):
-        return df_movie  # Retournez un DataFrame vide si la personne ou les titres sont invalides
+        return pd.DataFrame()  # Retourner un DataFrame vide si aucun titre associé
 
-    for movie_id in person['known_for_titles']:
-        if df_movie.empty:
-            df_movie = get_movie_with_id(df, movie_id)
-        else:
-            df_movie = pd.concat([df_movie, get_movie_with_id(df, movie_id)], ignore_index=True)
+    # Liste des IDs des films dans known_for_titles
+    movie_ids = person['known_for_titles']
 
-    return df_movie
+    # Filtrer les films dans le DataFrame principal avec isin
+    df_movies = df[df['id'].isin(movie_ids)].copy()
+
+    return df_movies
+
