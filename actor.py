@@ -92,7 +92,8 @@ if actor_id is None:
 else:
     # Chargement des données des films
     df_movies_full = load_data()  # Chargement des films
-    df_movies = get_movies_with_person_id(df_movies_full, actor_dico, actor_id).head(10)  # Passer actor_dico
+    df_movies = get_movies_with_person_id(df_movies_full, actor_dico, actor_id).head(10)
+
     # Récupérer les détails de l'acteur sélectionné
     actor_details = get_person_with_id(actor_dico, actor_id)    
 
