@@ -53,20 +53,47 @@ selection = sac.steps(
 
 #Etape 1
 if selection == "Etape 1":
+    st.markdown("<p>Pour mener à bien notre projet, nous disposions de plusieurs DataFrames issus d'IMDB ainsi que de la possibilité d'utiliser l'API TMDB</p>", unsafe_allow_html=True)
+    st.markdown("<p>Nous avons commencé par analyser et nettoyer les différents DataFrames d'IMDB afin de déterminer comment les rassembler en un seul DataFrame.</p>", unsafe_allow_html=True)
     st.image("images/etape1.png")
     st.image("images/etape2.png")
     st.image("images/etape3.png")
-    st.title("Les requettes pour la création de la base avec IMDB")
-    html_content = load_notebook_as_html(notebook_path)
-    components.html(html_content, height=800, scrolling=True)
-
+    st.markdown("<p>Nous nous sommes rapidement rendu compte qu'il manquait plusieurs informations importantes dans les DataFrames d'IMDB, telles que les résumés des films et leurs images.</p>", unsafe_allow_html=True)
+    st.markdown("<p>Nous avons donc décidé d'utiliser l'API TMDB, qui contenait les mêmes informations qu'IMDB, mais avec les données manquantes en supplément.</p>", unsafe_allow_html=True)
+    
 #Etape 2
 elif selection == "Etape 2":
-    st.title("Choix de se focaliser uniquement sur IMDB")
-    st.text("Aprés étude de la base TMDB, l'ensemble des infos sont requétable par API. Nous avons donc décidé de constituer une nouvelle base uniquement à partir des données de TMDB")
-    st.title("Les requettes pour la création de la base avec TMDB")
-    html_content = load_notebook_as_html(notebook_path)
-    components.html(html_content, height=800, scrolling=True)
+    st.markdown("<p>Pour construire notre DataFrame de films en utilisant l'API TMDB, nous avons appliqué des filtres précis afin de répondre aux attentes de notre public cible, composé principalement de personnes âgées de plus de 70 ans.</p>", unsafe_allow_html=True)
+    st.markdown("<p>Voici les étapes détaillées de notre sélection :</p>", unsafe_allow_html=True)
+    st.markdown("""
+                <p><strong>Premièrement</strong>, nous avons utilisé la référence Discover de l'API TMDB pour rechercher et filtrer les films selon des critères précis.</p>
+                <div style="margin-left: 40px;">   
+                    <h2>Première sélection : les films classiques</h2>
+                    <p>Nous avons filtré les films avec les critères suivants :</p>
+                    <ul>
+                        <li><strong>Date de sortie :</strong> entre le <code>1950-01-01</code> et le <code>2024-08-30</code></li>
+                        <li><strong>Note moyenne :</strong> supérieure ou égale à <code>6</code></li>
+                        <li><strong>Nombre de votes :</strong> supérieur ou égal à <code>1000</code> afin d'éviter les films ayant une bonne note, mais uniquement votés par un faible nombre de personnes, comme la famille ou des proches.</li>
+                        <li><strong>Durée :</strong> entre <code>70</code> et <code>300</code> minutes pour inclure des films d'une durée comprise entre 1h10 (minimum) et 5h (maximum), en prenant en compte les versions longues comme les directors' cut.</li>
+                    </ul>
+                    <p>Ces critères nous permettent de sélectionner des films emblématiques comme <em>La Grande Vadrouille</em>, qui correspondent aux attentes de notre public cible, principalement composé de personnes de plus de 70 ans.</p>
+                </div> 
+                <div style="margin-left: 40px;"> 
+                    <h2>Deuxième sélection : les sorties récentes</h2>
+                    <p>Nous avons également effectué une deuxième sélection pour les films plus récents, sortis ces trois derniers mois, avec des critères adaptés :</p>
+                    <ul>
+                        <li><strong>Date de sortie :</strong> entre le <code>2024-09-01</code> et le <code>2024-11-30</code></li>
+                        <li><strong>Note moyenne :</strong> supérieure ou égale à <code>6</code></li>
+                        <li><strong>Nombre de votes :</strong> supérieur ou égal à <code>500</code> un seuil plus bas que pour les films classiques, car les sorties récentes, comme Gladiator 2, n'ont pas encore accumulé un grand nombre de votes malgré leur succès.</li>
+                        <li><strong>Durée :</strong> entre <code>70</code> et <code>300</code> minutes</li>
+                    </ul>
+                    <p>Cette approche nous permet d'inclure des films populaires récents tout en filtrant rigoureusement la qualité et la représentativité des avis. Ainsi, nous disposons d'une sélection équilibrée entre classiques et nouveautés adaptées à notre public cible.</p>
+                </div>  
+                <p><strong>Deuxièmement</strong>, nous avons utilisé la référence <strong>Details</strong> de <strong>Movie</strong> pour récupérer des informations supplémentaires sur chaque film, telles que la durée exacte (runtime).</p>
+                <p><strong>Troisièmement</strong>, nous avons récupéré la distribution (le cast) de chaque film grâce à la référence <strong>Credits</strong> de <strong>Movie</strong>, ce qui nous a permis d'obtenir la liste complète des acteurs et des membres de l'équipe associés à chaque œuvre.</p>
+                <p><strong>Quatrièmement</strong>, nous avons récupéré des informations détaillées sur chaque personne du cast en utilisant la référence <strong>Details</strong> de <strong>Person</strong>. Cela nous a permis d'enrichir nos données avec des détails tels que la biographie, la date de naissance, ou encore la filmographie de chaque acteur et membre de l'équipe.</p>
+                
+                """, unsafe_allow_html=True)
     
 
 #Etape 3
