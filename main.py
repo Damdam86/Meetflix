@@ -4,7 +4,7 @@ st.set_page_config(
     page_title="Recommandation de Film",
     page_icon="🎬",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # Définir les pages pour la navigation
