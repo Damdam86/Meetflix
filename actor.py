@@ -3,6 +3,8 @@ import pandas as pd
 import ast
 import requests
 from fonctions import get_actors_info, get_movie_with_id, get_person_with_id, get_movies_with_person_id, load_data
+from data_manager import person_dico
+
 # Clé API pour TMDb
 api_key = st.secrets['API_KEY']
 
@@ -56,7 +58,7 @@ with col2:
 ######################################## DEBUT PAGE ####################################################
 
 # Récupérer le movie_id depuis l'URL
-query_params = st.query_params  # Méthode mise à jour
+query_params = st.query_params  # Récupération des paramètres
 actor_id = query_params.get("actor_id")
 
 if actor_id:
@@ -69,27 +71,21 @@ if actor_id:
 if actor_id is None:
     st.markdown("### 👨‍🎤 Liste des acteurs disponibles")
     
-    # Charger les données des films
-    df = load_data()
-    
-    # Extraire tous les acteurs uniques à partir de la colonne "cast"
-    all_cast = []
-    for cast_list in df['cast']:
-        if isinstance(cast_list, str):  # Vérifier que la donnée est une chaîne JSON
-            cast = ast.literal_eval(cast_list)
-            all_cast.extend(cast)
-    
-    # Créer un DataFrame des acteurs uniques
-    df_cast = pd.DataFrame(all_cast).drop_duplicates(subset='id', keep='first')
-    actor_names = df_cast['name'].tolist()
+    # Charger les données des acteurs
+    actor_dico = pd.DataFrame(person_dico.values())
+
+    # Liste des noms des acteurs
+    actor_names = actor_dico['name'].tolist()
     
     # Affichez une liste déroulante pour sélectionner un acteur
     selected_actor_name = st.selectbox("Choisissez un acteur :", ["Sélectionnez un acteur"] + actor_names)
-    
+
     if selected_actor_name != "Sélectionnez un acteur":
-        selected_actor_id = df_cast.loc[df_cast['name'] == selected_actor_name, 'id'].values[0]
-        st.experimental_set_query_params(actor_id=selected_actor_id)
-        st.experimental_rerun()
+        selected_actor_id = actor_dico.loc[actor_dico['name'] == selected_actor_name, 'id'].values[0]
+        
+        # Mettre à jour les paramètres de l'URL
+        query_params.update(actor_id=selected_actor_id)
+        st.rerun()
     else:
         st.warning("Veuillez sélectionner un acteur pour voir ses détails.")
 else:
@@ -113,16 +109,35 @@ else:
         with col1:
             profile_path = actor_details.get("profile_path")
             if profile_path:
-                st.image(f"https://image.tmdb.org/t/p/original/{profile_path}", caption=actor_details.get("name", "Nom inconnu"), width=image_width)
-            st.markdown(f"**Date de naissance :** {actor_details.get('birthday', 'Date de naissance non spécifiée')}")
-            st.markdown(f"**Lieu de naissance :** {actor_details.get('place_of_birth', 'Lieu de naissance non spécifié')}")
+                st.image(f"https://image.tmdb.org/t/p/original/{profile_path}", 
+                         caption=actor_details.get("name", "Nom inconnu"), 
+                         width=image_width)
+            st.markdown(f"**Date de naissance :** {actor_details.get('birthday', 'Date non spécifiée')}")
+            st.markdown(f"**Lieu de naissance :** {actor_details.get('place_of_birth', 'Non spécifié')}")
 
-        # Affichage des autres informations
-        with col2:
-            st.markdown("")
-        
         with col3:
             st.markdown(f"**Biographie :** {actor_details.get('biography', 'Biographie non disponible')}")
 
+    # Affichage des films
     st.markdown("#### 🎥 Films de l'acteur :")
     movie_cols = st.columns(5)  # Crée 5 colonnes
+    for i, (_, movie) in enumerate(df_movies.iterrows()):
+        with movie_cols[i % 5]:  # Répartir les films dans les colonnes
+            movie_poster = movie.get("poster_path")
+            movie_title = movie.get("title", "Titre inconnu")
+            movie_id = movie.get("id")
+
+            # Affichage de l'affiche et du titre
+            if movie_poster:
+                poster_url = f"https://image.tmdb.org/t/p/original/{movie_poster}"
+            else:
+                poster_url = "https://via.placeholder.com/200x300.png?text=Aucune+affiche"
+
+            st.markdown(f"""
+            <div class="movie-card">
+                <a href="/movie?movie_id={movie_id}" style="text-decoration: none; color: inherit;" target="_self">
+                <img src="{poster_url}" class="movie-poster">
+                <p>{movie_title}</p>
+                </a>
+            </div>
+            """, unsafe_allow_html=True)
