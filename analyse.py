@@ -99,18 +99,52 @@ elif selection == "Etape 2":
 #Etape 3
 elif selection == "Etape 3":
     st.title("Statistique TMDB")
-    tab1, tab2, tab3 = st.tabs(["Acteurs", "Films", "Pays"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Genres", "Années", "Durée", "Pays"])
 
     with tab1:
-        st.header("Acteurs")
+        st.header("Genres")
+        df['genres'] = df['genres'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
 
+        all_genres = df.explode('genres')
+
+        all_genres['genre_name'] = all_genres['genres'].apply(lambda x: x['name'] if isinstance(x, dict) and 'name' in x else None)
+
+        all_genres = all_genres.dropna(subset=['genre_name'])
+
+        genre_counts = all_genres['genre_name'].value_counts().reset_index()
+        genre_counts.columns = ['Genre', 'Count']
+
+        fig1 = px.bar(
+            genre_counts,
+            x='Genre',
+            y='Count',
+            color='Count',
+            title="Distribution des Genres les Plus Fréquents",
+            labels={'Count': 'Nombre de films', 'Genre': 'Genre'}
+)
+        fig1.update_layout(
+            xaxis_title="Genre",
+            yaxis_title="Nombre de films",
+            xaxis={'categoryorder': 'total descending'},  # Trier les genres par ordre décroissant de popularité
+            height=600,
+            width=1250,
+            margin=dict(l=50, r=50, t=50, b=150)
+)   
+        fig1.show()
     with tab2:
-        st.header("Films")
+        st.header("Années")
+        yearly_movies = df['release_year'].value_counts().reset_index()
+        yearly_movies.columns = ['Année', 'Nombre de films']
 
+        fig2 = px.line(yearly_movies.sort_values('Année'), x='Année', y='Nombre de films',
+              title="Évolution des sorties de films par année")
+
+        fig2.update_traces(line=dict(color='indigo'))  
+        fig2.show()
     with tab3:
         st.header("Pays")
         
-        fig1 = px.histogram(
+        '''fig1 = px.histogram(
         df, 
         x='vote_count', 
         nbins=20, 
@@ -139,14 +173,14 @@ elif selection == "Etape 3":
         )
 
         #scatter plot des votes vs notes
-        fig4 = px.scatter(df, x='vote_count', y='vote_average', hover_data=['title'], title='Votes vs Notes')
+        fig4 = px.scatter(df, x='vote_count', y='vote_average', hover_data=['title'], title='Votes vs Notes')'''
 
         # Affichage côte à côte dans Streamlit
         col1, col2 = st.columns(2)
 
         with col1:
             st.plotly_chart(fig1, use_container_width=True)
-            st.plotly_chart(fig3, use_container_width=True)
+            st.plotly_chart(fig2, use_container_width=True)
 
 
         with col2:
