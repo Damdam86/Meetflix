@@ -15,7 +15,6 @@ st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 # Récupérer les backdrops aléatoires
 backdrops = get_random_backdrops()
 
-
 ######################################################################## BARRE DE NAVIGATION ########################################################################
 
 # Diviser l'affichage en deux colonnes
@@ -180,6 +179,20 @@ with col1:
     selected_movie_title = st.selectbox("Choisissez un film :", titres)
     # Récupérer l'ID du film sélectionné
     selected_movie_id = data[data['title'] == selected_movie_title]['id'].values[0]
+
+    def user_define_weights():
+        with st.expander("Ajustez les poids des variables", expanded=False):
+            vote_average_weight = st.select_slider("Poids pour 'vote_average'", options=range(1, 6), value=2)
+            vote_count_weight = st.select_slider("Poids pour 'vote_count'", options=range(1, 6), value=1)
+            genre_weight = st.select_slider("Poids pour 'genres'", options=range(1, 6), value=3)
+            return {
+        'vote_average': vote_average_weight,
+        'vote_count': vote_count_weight,
+        'genres': genre_weight
+        }
+        
+    weights = user_define_weights()
+
 
     if selected_movie_id is not None:
         st.markdown(

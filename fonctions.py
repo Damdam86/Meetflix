@@ -10,12 +10,24 @@ import random
 
 api_key = st.secrets['API_KEY']
 
-
+# On load les datas (recoltées par l'API TMDB)
 @st.cache_data
 def load_data():
     file_path = 'https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'
     df = pd.read_csv(file_path, sep=',')
     return df
+
+#On load les keyswords générés par OpenAI
+@st.cache_data
+def get_keywords(data):
+    file_path = 'https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'
+    df_keywords = pd.read_csv(file_path, sep=',')
+    all_keywords = []
+    for keywords in data['keywords'].dropna():
+        keywords_list = ast.literal_eval(keywords)
+        all_keywords.extend([kw['name'] for kw in keywords_list])
+    return all_keywords
+
 
 # Chargement et préparation des données
 @st.cache_data
@@ -29,9 +41,20 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     # Utiliser `get_dummies` pour créer des colonnes de genres
     genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
     # Sélectionner les colonnes numériques
-    numerical_features = data[['vote_average', 'vote_count']]
+    numerical_features = data[['vote_average', 'vote_count', 'popularity']]
 
     return data, numerical_features, genres_dummies
+
+def user_define_weights():
+        with st.expander("Ajustez les poids des variables", expanded=False):
+            vote_average_weight = st.select_slider("Poids pour 'vote_average'", options=range(1, 11), value=2)
+            vote_count_weight = st.select_slider("Poids pour 'vote_count'", options=range(1, 11), value=1)
+            genre_weight = st.select_slider("Poids pour 'genres'", options=range(1, 11), value=3)
+            return {
+        'vote_average': vote_average_weight,
+        'vote_count': vote_count_weight,
+        'genres': genre_weight
+        }
 
 # Préparation du pipeline KNN
 @st.cache_data
@@ -44,38 +67,39 @@ def create_and_train_pipeline(numerical_features, genres_dummies, weights=None):
             'genres': 3         # Poids pour les genres
         }
 
-    # 1. Application des poids aux colonnes numériques
+    # Poids pour les colonnes numériques
     numerical_features_weighted = numerical_features.copy()
     for col in numerical_features.columns:
         numerical_features_weighted[col] *= weights.get(col, 1)  # Appliquer les poids dynamiquement
 
-    # 2. Standardisation des colonnes numériques
+    # Poids pour les genres
+    genres_weighted = (genres_dummies**2) * weights['genres']
+
+    # Standardisation des colonnes numériques
     scaler = StandardScaler()
     numerical_features_scaled = scaler.fit_transform(numerical_features_weighted)
 
-    # Reconstruction du DataFrame standardisé
+
+    # DataFrame avec l'ensemble des infos
     numerical_features_scaled_df = pd.DataFrame(
         numerical_features_scaled,
         columns=numerical_features.columns,
         index=numerical_features.index
     )
 
-    # 3. Application des poids aux genres
-    genres_weighted = genres_dummies * weights['genres']
-
-    # 4. Réindexation
+    # Réindexation par sécurité
     numerical_features_scaled_df.reset_index(drop=True, inplace=True)
     genres_weighted.reset_index(drop=True, inplace=True)
 
-    # 5. Concaténation des données pondérées
+    # Concaténation de l'ensemble des données (numerique + genre)
     X_extended = pd.concat([numerical_features_scaled_df, genres_weighted], axis=1)
 
-    # 6. Préparation du pipeline pour le modèle KNN
+    # Préparation du pipeline pour le modèle KNN
     pipeline = Pipeline([
-        ('knn', NearestNeighbors(n_neighbors=15))  # KNN uniquement
+        ('knn', NearestNeighbors(n_neighbors=26))  # KNN uniquement
     ])
 
-    # Entraînement du modèle
+    # Entraînement du modèle KNN
     pipeline.fit(X_extended)
 
     return pipeline, X_extended, scaler
@@ -104,6 +128,7 @@ def recommend_movies(movie_id, data, X_extended, pipeline, numerical_features, g
     voisins = voisins[voisins['id'] != movie_id]
 
     # Construire la liste des recommandations
+    voisins = voisins.sort_values(by='Distance')
     recommended_movies = []
     for index in voisins.index:
         voisin_movie = data.loc[index]
@@ -183,11 +208,3 @@ def get_movies_with_person_id(df: pd.DataFrame, actor_dico: pd.DataFrame, person
     df_movies = df[df['id'].isin(movie_ids)].copy()
 
     return df_movies
-
-@st.cache_data
-def get_unique_keywords(data):
-    all_keywords = []
-    for keywords in data['keywords'].dropna():
-        keywords_list = ast.literal_eval(keywords)
-        all_keywords.extend([kw['name'] for kw in keywords_list])
-    return all_keywords  # Supprime les doublons et trie

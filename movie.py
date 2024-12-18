@@ -1,18 +1,11 @@
 import streamlit as st
 import ast
-from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies
+from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies, user_define_weights
 
 ############################ Chargement des données, poids des variables, entrainement de la recommandation ############################################################
-weights = {
-    'vote_average': 2,  # Vote_average a un poids plus important
-    'vote_count': 1,    # Vote_count moins important
-    'popularity': 3,    # Popularité moyennement importante
-    'genres': 3         # Les genres ont un poids important
-}
+
 # Chargement et préparation des données
 data, numerical_features, genres_dummies = load_and_prepare_data()
-# Création et entraînement du pipeline
-pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies, weights=weights)
 
 ##################################################################### ID MOVIES dans la barre de navigation ###########################################################
 
@@ -144,9 +137,17 @@ with col3:  # Résumé et détails techniques
 
 # Nos recommandations
 st.markdown(f"#### 📸 Nos recommandations pour '{selected_movie_title}'")
+weights = user_define_weights()
+# Création et entraînement du pipeline
+pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies, weights= weights)
 voisins = recommend_movies(selected_movie_id,data, X_extended, pipeline, numerical_features, genres_dummies)
-cols = st.columns(5)  # Création de 5 colonnes pour l'affichage en ligne
-for i, voisin in enumerate(voisins):
+
+# Affichage des recommandations par 5 colonnes
+cols = st.columns(5)
+
+voisins_top_10 = voisins[:10] #Réduction de la liste voisin à uniquement 10 films (pour améliorer le choix des variables)
+
+for i, voisin in enumerate(voisins_top_10):
     with cols[i % 5]:  # Répartir les films dans les colonnes de manière circulaire
         if voisin['poster']:
             poster_url = f"https://image.tmdb.org/t/p/w500{voisin['poster']}"
@@ -159,6 +160,7 @@ for i, voisin in enumerate(voisins):
                 <img src='{poster_url}' class='movie-poster'>
                 <p>{voisin['title']}</p>
                 <p class='movie-meta'>⭐ {voisin['note']:.1f}/10</p>
+                <p class='movie-meta'> ↔ {voisin['distance']:.2f}</p>
                 </a>
             </div>
         
