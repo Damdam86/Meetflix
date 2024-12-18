@@ -113,15 +113,24 @@ most_recent_year = dtt.get_most_recent_year(movies_list)
 min_vote_average = dtt.get_min_vote_average(movies_list)
 max_vote_average = dtt.get_max_vote_average(movies_list)
 
-selected_genre = st.multiselect("Filtrez par genre :", genres)
 
-selected_year = st.slider("Sélectionner une plage d'années", most_older_year, most_recent_year, (most_older_year, most_recent_year))
+col1, col2, col3 = st.columns([4,1,4])
 
-selected_vote_average = st.slider("Sélectionner une plage de vote", min_vote_average, max_vote_average, (min_vote_average, max_vote_average))
+with col1: 
+    selected_genre = st.multiselect("Filtrez par genre :", genres)
+    selected_year = st.slider("Sélectionner une plage d'années", most_older_year, most_recent_year, (most_older_year, most_recent_year))
 
+with col2: #Colonne de séparation
+    st.title("")
 
-if selected_genre or selected_year or selected_vote_average:
-    df_movie_filtered = dtt.get_filtered_df(movies_list, genres = selected_genre, min_year = selected_year[0], max_year = selected_year[1], min_vote_average = selected_vote_average[0], max_vote_average = selected_vote_average[1])
+with col3: 
+    selected_keywords = st.multiselect("Filtrez par mots clés :", genres)
+    selected_vote_average = st.slider("Sélectionner une plage de vote", min_vote_average, max_vote_average, (min_vote_average, max_vote_average))
+
+    if selected_genre or selected_year or selected_vote_average:
+        df_movie_filtered = dtt.get_filtered_df(movies_list, genres = selected_genre, min_year = selected_year[0], max_year = selected_year[1], min_vote_average = selected_vote_average[0], max_vote_average = selected_vote_average[1])
+
+st.title("") # Texte de séparation
 
 # Limiter l'affichage au nombre défini par `visible_movies`
 visible_movies = st.session_state["visible_movies"]

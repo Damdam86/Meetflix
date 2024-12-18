@@ -157,3 +157,10 @@ def get_movies_with_person_id(df: pd.DataFrame, actor_dico: pd.DataFrame, person
 
     return df_movies
 
+@st.cache_data
+def get_unique_keywords(data):
+    all_keywords = []
+    for keywords in data['keywords'].dropna():
+        keywords_list = ast.literal_eval(keywords)
+        all_keywords.extend([kw['name'] for kw in keywords_list])
+    return all_keywords  # Supprime les doublons et trie
