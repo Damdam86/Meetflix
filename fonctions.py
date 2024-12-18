@@ -20,7 +20,7 @@ def load_data():
 #On load les keyswords générés par OpenAI
 @st.cache_data
 def get_keywords(data):
-    file_path = 'https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'
+    file_path = ''
     df_keywords = pd.read_csv(file_path, sep=',')
     all_keywords = []
     for keywords in data['keywords'].dropna():
@@ -40,6 +40,7 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
     # Utiliser `get_dummies` pour créer des colonnes de genres
     genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
+    
     # Sélectionner les colonnes numériques
     numerical_features = data[['vote_average', 'vote_count', 'popularity']]
 
@@ -141,8 +142,6 @@ def recommend_movies(movie_id, data, X_extended, pipeline, numerical_features, g
         })
 
     return recommended_movies
-
-
 
 # Récupérer les détails d'un acteur
 def get_actors_info(actor_id):

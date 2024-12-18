@@ -99,48 +99,59 @@ elif selection == "Etape 2":
 #Etape 3
 elif selection == "Etape 3":
     st.title("Statistique TMDB")
-    fig1 = px.histogram(
-    df, 
-    x='vote_count', 
-    nbins=20, 
-    title='Distribution du nbre de vote par film',
-    labels={'vote_count': 'Vote Count'}
-)
+    tab1, tab2, tab3 = st.tabs(["Acteurs", "Films", "Pays"])
 
-    fig2 = px.histogram(
+    with tab1:
+        st.header("Acteurs")
+
+    with tab2:
+        st.header("Films")
+
+    with tab3:
+        st.header("Pays")
+        
+        fig1 = px.histogram(
         df, 
-        x='vote_average', 
-        title='Distribition de la note moyenne par film',
+        x='vote_count', 
+        nbins=20, 
+        title='Distribution du nbre de vote par film',
+        labels={'vote_count': 'Vote Count'}
     )
 
-    # Sélectionner les films populaires (avec plus de 1000 votes)
-    popular_movies = df[df['vote_count'] >= 1000]
-    # Trier les films populaires par note moyenne de manière descendante et prendre les 10 meilleurs
-    top_rated_movies = popular_movies.sort_values(by='vote_average', ascending=False).head(10)
-    # Créer un bar chart avec Plotly
-    fig3 = px.bar(
-        top_rated_movies,
-        x='vote_average',
-        y='title',
-        color='vote_average',
-        color_continuous_scale='viridis',
-        title='Films les plus appréciés'
-    )
+        fig2 = px.histogram(
+            df, 
+            x='vote_average', 
+            title='Distribition de la note moyenne par film',
+        )
 
-    #scatter plot des votes vs notes
-    fig4 = px.scatter(df, x='vote_count', y='vote_average', hover_data=['title'], title='Votes vs Notes')
+        # Sélectionner les films populaires (avec plus de 1000 votes)
+        popular_movies = df[df['vote_count'] >= 1000]
+        # Trier les films populaires par note moyenne de manière descendante et prendre les 10 meilleurs
+        top_rated_movies = popular_movies.sort_values(by='vote_average', ascending=False).head(10)
+        # Créer un bar chart avec Plotly
+        fig3 = px.bar(
+            top_rated_movies,
+            x='vote_average',
+            y='title',
+            color='vote_average',
+            color_continuous_scale='viridis',
+            title='Films les plus appréciés'
+        )
 
-    # Affichage côte à côte dans Streamlit
-    col1, col2 = st.columns(2)
+        #scatter plot des votes vs notes
+        fig4 = px.scatter(df, x='vote_count', y='vote_average', hover_data=['title'], title='Votes vs Notes')
 
-    with col1:
-        st.plotly_chart(fig1, use_container_width=True)
-        st.plotly_chart(fig3, use_container_width=True)
+        # Affichage côte à côte dans Streamlit
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.plotly_chart(fig1, use_container_width=True)
+            st.plotly_chart(fig3, use_container_width=True)
 
 
-    with col2:
-        st.plotly_chart(fig2, use_container_width=True)
-        st.plotly_chart(fig4, use_container_width=True)
+        with col2:
+            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig4, use_container_width=True)
 
 #Etape 4
 elif selection == "Etape 4":
