@@ -6,6 +6,7 @@ from sklearn.pipeline import Pipeline
 import requests
 import streamlit as st
 import random
+import df_tmdb_tool as dtt
 
 
 api_key = st.secrets['API_KEY']
@@ -32,14 +33,16 @@ def get_keywords(data):
 # Chargement et préparation des données
 @st.cache_data
 def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'):
-    # Chargement du dataset
-    data = pd.read_csv(file_path)
-    # Convertir la colonne `genres` en dictionnaires
-    data['genres'] = data['genres'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+    # Chargement du dataset et convertion des colonne ['genres'] et ['cast'] en dictionnaires, ['origin_country'] en list
+    data = dtt.csv_to_df(file_path)
     # Créer une nouvelle colonne contenant uniquement les noms des genres
     data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
+    # Créer une nouvelle colonne contenant uniquement les noms des 5 acteurs principaux
+    data['cast_names'] = data['cast'].apply(lambda persons: [person['name'] for person in persons[:5]] if persons else [])
     # Utiliser `get_dummies` pour créer des colonnes de genres
     genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
+    # Utiliser `get_dummies` pour créer des colonnes de cast
+    cast_dummies = data['cast_names'].str.join('|').str.get_dummies()
     
     # Sélectionner les colonnes numériques
     numerical_features = data[['vote_average', 'vote_count', 'popularity']]
