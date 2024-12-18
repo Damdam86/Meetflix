@@ -28,34 +28,61 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
     # Utiliser `get_dummies` pour créer des colonnes de genres
     genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
-    # Ajouter les genres au DataFrame original
-    data_extended = pd.concat([data, genres_dummies], axis=1)
+    # Sélectionner les colonnes numériques
+    numerical_features = data[['vote_average', 'vote_count']]
 
-    # Sélectionner les colonnes numériques et les genres dummies
-    numerical_features = data[['vote_average', 'vote_count']]  # Ajouter ici d'autres colonnes si nécessaire
-    X_extended = pd.concat([numerical_features, genres_dummies], axis=1)
-
-    data.reset_index(drop=True, inplace=True)
-    X_extended.reset_index(drop=True, inplace=True)
-
-    return data, X_extended
+    return data, numerical_features, genres_dummies
 
 # Préparation du pipeline KNN
 @st.cache_data
-def create_and_train_pipeline(X_extended):
-    # Préparation du pipeline pour le modèle KNN
+def create_and_train_pipeline(numerical_features, genres_dummies, weights=None):
+    # Définir les poids par défaut pour chaque variable
+    if weights is None:
+        weights = {
+            'vote_average': 2,  # Plus important
+            'vote_count': 1,    # Moins important
+            'genres': 3         # Poids pour les genres
+        }
+
+    # 1. Application des poids aux colonnes numériques
+    numerical_features_weighted = numerical_features.copy()
+    for col in numerical_features.columns:
+        numerical_features_weighted[col] *= weights.get(col, 1)  # Appliquer les poids dynamiquement
+
+    # 2. Standardisation des colonnes numériques
+    scaler = StandardScaler()
+    numerical_features_scaled = scaler.fit_transform(numerical_features_weighted)
+
+    # Reconstruction du DataFrame standardisé
+    numerical_features_scaled_df = pd.DataFrame(
+        numerical_features_scaled,
+        columns=numerical_features.columns,
+        index=numerical_features.index
+    )
+
+    # 3. Application des poids aux genres
+    genres_weighted = genres_dummies * weights['genres']
+
+    # 4. Réindexation
+    numerical_features_scaled_df.reset_index(drop=True, inplace=True)
+    genres_weighted.reset_index(drop=True, inplace=True)
+
+    # 5. Concaténation des données pondérées
+    X_extended = pd.concat([numerical_features_scaled_df, genres_weighted], axis=1)
+
+    # 6. Préparation du pipeline pour le modèle KNN
     pipeline = Pipeline([
-        ('scaler', StandardScaler()),  # Standardisation des données
-        ('knn', NearestNeighbors(n_neighbors=11))  ### Modification du n_neighbors pour monter ou diminuer le nbre de recommandation ###
+        ('knn', NearestNeighbors(n_neighbors=15))  # KNN uniquement
     ])
 
-    # Entraîner le pipeline sur `X_extended`
+    # Entraînement du modèle
     pipeline.fit(X_extended)
 
-    return pipeline
+    return pipeline, X_extended, scaler
+
 
 # Fonction de recommandation
-def recommend_movies(movie_id, data, X_extended, pipeline):
+def recommend_movies(movie_id, data, X_extended, pipeline, numerical_features, genres_dummies):
     # Vérifier si l'ID du film existe dans les données
     if not data['id'].isin([movie_id]).any():
         return []
@@ -63,21 +90,20 @@ def recommend_movies(movie_id, data, X_extended, pipeline):
     # Trouver l'index du film à partir de l'ID
     movie_index = data.index[data['id'] == movie_id].tolist()[0]
 
-    # Préparer les données du film à recommander
-    movie_data = pd.DataFrame([X_extended.iloc[movie_index]], columns=X_extended.columns)
+    # Extraire les données du film sélectionné (directement de X_extended)
+    movie_data = X_extended.loc[movie_index].to_frame().T
 
-    # Standardiser les données
-    data_scale = pipeline.named_steps['scaler'].transform(movie_data)
+    # Trouver les voisins les plus proches
+    distances, indices = pipeline.named_steps['knn'].kneighbors(movie_data)
 
-    # Obtenir les voisins les plus proches en utilisant KNN
-    distances, indices = pipeline.named_steps['knn'].kneighbors(data_scale)
+    # Récupérer les voisins
     voisins = data.iloc[indices[0]].copy()
     voisins['Distance'] = distances[0]
 
-    # Filtrer le film original pour ne pas l'afficher comme une recommandation
+    # Exclure le film original des recommandations
     voisins = voisins[voisins['id'] != movie_id]
 
-    # Récupérer les informations des voisins (posters et titres) à partir du dataset
+    # Construire la liste des recommandations
     recommended_movies = []
     for index in voisins.index:
         voisin_movie = data.loc[index]
@@ -90,6 +116,7 @@ def recommend_movies(movie_id, data, X_extended, pipeline):
         })
 
     return recommended_movies
+
 
 
 # Récupérer les détails d'un acteur

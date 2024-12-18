@@ -2,10 +2,19 @@ import streamlit as st
 import ast
 from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies
 
+############################ Chargement des données, poids des variables, entrainement de la recommandation ############################################################
+weights = {
+    'vote_average': 2,  # Vote_average a un poids plus important
+    'vote_count': 1,    # Vote_count moins important
+    'popularity': 3,    # Popularité moyennement importante
+    'genres': 3         # Les genres ont un poids important
+}
 # Chargement et préparation des données
-data, X_extended = load_and_prepare_data()
+data, numerical_features, genres_dummies = load_and_prepare_data()
 # Création et entraînement du pipeline
-pipeline = create_and_train_pipeline(X_extended)
+pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies, weights=weights)
+
+##################################################################### ID MOVIES dans la barre de navigation ###########################################################
 
 # Récupérer le movie_id depuis l'URL
 query_params = st.query_params  # Méthode mise à jour
@@ -15,6 +24,8 @@ if isinstance(movie_id, list):  # Gérer le cas où c'est une liste
     movie_id = movie_id[0]
 
 movie_id = int(movie_id) if movie_id else None  # Convertir ou None
+
+############################################################################## CSS ####################################################################################
 
 # Insertion du CSS dans la page Streamlit
 with open('style.css') as c:
@@ -133,7 +144,7 @@ with col3:  # Résumé et détails techniques
 
 # Nos recommandations
 st.markdown(f"#### 📸 Nos recommandations pour '{selected_movie_title}'")
-voisins = recommend_movies(selected_movie_id, data, X_extended, pipeline)
+voisins = recommend_movies(selected_movie_id,data, X_extended, pipeline, numerical_features, genres_dummies)
 cols = st.columns(5)  # Création de 5 colonnes pour l'affichage en ligne
 for i, voisin in enumerate(voisins):
     with cols[i % 5]:  # Répartir les films dans les colonnes de manière circulaire
