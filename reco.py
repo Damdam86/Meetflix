@@ -118,10 +118,10 @@ else:
     st.error("Aucun backdrop disponible pour afficher le carrousel.")
 
 # Chargement et préparation des données
-data, numerical_features, genres_dummies = load_and_prepare_data()
+data, numerical_features, genres_dummies, cast_dummies = load_and_prepare_data()
 
 # Création et entraînement du pipeline
-pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies)
+pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies)
 
 # Récupérer les films actuellement au cinéma
 now_playing_url = f"https://api.themoviedb.org/3/movie/now_playing?language=fr-FR&page=1&api_key={api_key}"

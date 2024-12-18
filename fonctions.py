@@ -47,13 +47,13 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     # Sélectionner les colonnes numériques
     numerical_features = data[['vote_average', 'vote_count', 'popularity']]
 
-    return data, numerical_features, genres_dummies
+    return data, numerical_features, genres_dummies, cast_dummies
 
 def user_define_weights():
         with st.expander("Ajustez les poids des variables", expanded=False):
-            vote_average_weight = st.select_slider("Poids pour 'vote_average'", options=range(1, 11), value=2)
+            vote_average_weight = st.select_slider("Poids pour 'vote_average'", options=range(1, 11), value=1)
             vote_count_weight = st.select_slider("Poids pour 'vote_count'", options=range(1, 11), value=1)
-            genre_weight = st.select_slider("Poids pour 'genres'", options=range(1, 11), value=3)
+            genre_weight = st.select_slider("Poids pour 'genres'", options=range(1, 11), value=1)
             return {
         'vote_average': vote_average_weight,
         'vote_count': vote_count_weight,
@@ -62,13 +62,13 @@ def user_define_weights():
 
 # Préparation du pipeline KNN
 @st.cache_data
-def create_and_train_pipeline(numerical_features, genres_dummies, weights=None):
+def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, weights=None):
     # Définir les poids par défaut pour chaque variable
     if weights is None:
         weights = {
-            'vote_average': 2,  # Plus important
+            'vote_average': 1,  # Plus important
             'vote_count': 1,    # Moins important
-            'genres': 3         # Poids pour les genres
+            'genres': 1         # Poids pour les genres
         }
 
     # Poids pour les colonnes numériques
@@ -94,9 +94,12 @@ def create_and_train_pipeline(numerical_features, genres_dummies, weights=None):
     # Réindexation par sécurité
     numerical_features_scaled_df.reset_index(drop=True, inplace=True)
     genres_weighted.reset_index(drop=True, inplace=True)
+    cast_dummies.reset_index(drop=True, inplace=True)
+    
 
     # Concaténation de l'ensemble des données (numerique + genre)
-    X_extended = pd.concat([numerical_features_scaled_df, genres_weighted], axis=1)
+    X_extended = pd.concat([numerical_features_scaled_df, genres_weighted, cast_dummies], axis=1)
+    print(X_extended)
 
     # Préparation du pipeline pour le modèle KNN
     pipeline = Pipeline([
@@ -110,7 +113,7 @@ def create_and_train_pipeline(numerical_features, genres_dummies, weights=None):
 
 
 # Fonction de recommandation
-def recommend_movies(movie_id, data, X_extended, pipeline, numerical_features, genres_dummies):
+def recommend_movies(movie_id, data, X_extended, pipeline, numerical_features, genres_dummies, cast_dummies):
     # Vérifier si l'ID du film existe dans les données
     if not data['id'].isin([movie_id]).any():
         return []

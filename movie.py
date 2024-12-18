@@ -5,7 +5,7 @@ from fonctions import load_and_prepare_data, create_and_train_pipeline, recommen
 ############################ Chargement des données, poids des variables, entrainement de la recommandation ############################################################
 
 # Chargement et préparation des données
-data, numerical_features, genres_dummies = load_and_prepare_data()
+data, numerical_features, genres_dummies, cast_dummies = load_and_prepare_data()
 
 ##################################################################### ID MOVIES dans la barre de navigation ###########################################################
 
@@ -139,8 +139,8 @@ with col3:  # Résumé et détails techniques
 st.markdown(f"#### 📸 Nos recommandations pour '{selected_movie_title}'")
 weights = user_define_weights()
 # Création et entraînement du pipeline
-pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies, weights= weights)
-voisins = recommend_movies(selected_movie_id,data, X_extended, pipeline, numerical_features, genres_dummies)
+pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, weights= weights)
+voisins = recommend_movies(selected_movie_id,data, X_extended, pipeline, numerical_features, genres_dummies, cast_dummies)
 
 # Affichage des recommandations par 5 colonnes
 cols = st.columns(5)
@@ -171,6 +171,7 @@ col1, col2, col3 = st.columns([1, 1, 3])
 
 with col1:
     st.markdown("#### 🎥 Bande-Annonce")
+    st.video(f'https://api.themoviedb.org/3/movie/{voisin['id']}/videos')
     st.markdown('**Bande-annonce non disponible**')
 
 with col3:
