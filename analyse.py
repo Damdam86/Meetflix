@@ -9,6 +9,7 @@ from streamlit_jupyter import StreamlitPatcher, tqdm
 import nbformat
 from nbconvert import HTMLExporter
 from fonctions import load_data
+import ast
 
 
 # Chargement des données
@@ -103,90 +104,60 @@ elif selection == "Etape 3":
 
     with tab1:
         st.header("Genres")
-        df['genres'] = df['genres'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+        col1, col2 = st.columns(2)
+        with col1:
+             st.title('')
+        with col2:
+             st.title('')
+             df['genres'] = df['genres'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+             all_genres = df.explode('genres')
+             all_genres['genre_name'] = all_genres['genres'].apply(lambda x: x['name'] if isinstance(x, dict) and 'name' in x else None)
+             all_genres = all_genres.dropna(subset=['genre_name'])
+             genre_counts = all_genres['genre_name'].value_counts().reset_index()
+             genre_counts.columns = ['Genre', 'Count']
+             fig1 = px.bar(
+                    genre_counts,
+                    x='Genre',
+                    y='Count',
+                    color='Count',
+                    title="Distribution des Genres les Plus Fréquents",
+                    labels={'Count': 'Nombre de films', 'Genre': 'Genre'}
+        )
+             fig1.update_layout(
+                    xaxis_title="Genre",
+                    yaxis_title="Nombre de films",
+                    xaxis={'categoryorder': 'total descending'},  # Trier les genres par ordre décroissant de popularité
+                    height=600,
+                    width=1250,
+                    margin=dict(l=50, r=50, t=50, b=150)
+        )   
+             fig1.show()
 
-        all_genres = df.explode('genres')
-
-        all_genres['genre_name'] = all_genres['genres'].apply(lambda x: x['name'] if isinstance(x, dict) and 'name' in x else None)
-
-        all_genres = all_genres.dropna(subset=['genre_name'])
-
-        genre_counts = all_genres['genre_name'].value_counts().reset_index()
-        genre_counts.columns = ['Genre', 'Count']
-
-        fig1 = px.bar(
-            genre_counts,
-            x='Genre',
-            y='Count',
-            color='Count',
-            title="Distribution des Genres les Plus Fréquents",
-            labels={'Count': 'Nombre de films', 'Genre': 'Genre'}
-)
-        fig1.update_layout(
-            xaxis_title="Genre",
-            yaxis_title="Nombre de films",
-            xaxis={'categoryorder': 'total descending'},  # Trier les genres par ordre décroissant de popularité
-            height=600,
-            width=1250,
-            margin=dict(l=50, r=50, t=50, b=150)
-)   
-        fig1.show()
     with tab2:
-        st.header("Années")
-        yearly_movies = df['release_year'].value_counts().reset_index()
-        yearly_movies.columns = ['Année', 'Nombre de films']
-
-        fig2 = px.line(yearly_movies.sort_values('Année'), x='Année', y='Nombre de films',
-              title="Évolution des sorties de films par année")
-
-        fig2.update_traces(line=dict(color='indigo'))  
-        fig2.show()
-    with tab3:
-        st.header("Pays")
-        
-        '''fig1 = px.histogram(
-        df, 
-        x='vote_count', 
-        nbins=20, 
-        title='Distribution du nbre de vote par film',
-        labels={'vote_count': 'Vote Count'}
-    )
-
-        fig2 = px.histogram(
-            df, 
-            x='vote_average', 
-            title='Distribition de la note moyenne par film',
-        )
-
-        # Sélectionner les films populaires (avec plus de 1000 votes)
-        popular_movies = df[df['vote_count'] >= 1000]
-        # Trier les films populaires par note moyenne de manière descendante et prendre les 10 meilleurs
-        top_rated_movies = popular_movies.sort_values(by='vote_average', ascending=False).head(10)
-        # Créer un bar chart avec Plotly
-        fig3 = px.bar(
-            top_rated_movies,
-            x='vote_average',
-            y='title',
-            color='vote_average',
-            color_continuous_scale='viridis',
-            title='Films les plus appréciés'
-        )
-
-        #scatter plot des votes vs notes
-        fig4 = px.scatter(df, x='vote_count', y='vote_average', hover_data=['title'], title='Votes vs Notes')'''
-
         # Affichage côte à côte dans Streamlit
         col1, col2 = st.columns(2)
-
         with col1:
+            st.header("Années")
+            yearly_movies = df['release_date'].value_counts().reset_index()
+            yearly_movies.columns = ['Année', 'Nombre de films']
+
+            fig2 = px.line(yearly_movies.sort_values('Année'), x='Année', y='Nombre de films', title="Évolution des sorties de films par année")
+            fig2.update_traces(line=dict(color='indigo'))  
+            fig2.show()
             st.plotly_chart(fig1, use_container_width=True)
-            st.plotly_chart(fig2, use_container_width=True)
-
-
         with col2:
             st.plotly_chart(fig2, use_container_width=True)
-            st.plotly_chart(fig4, use_container_width=True)
 
+    with tab3:
+        st.header("Pays")
+        # Affichage côte à côte dans Streamlit
+        col1, col2 = st.columns(2)
+        with col1:
+             st.title('')
+        with col2:
+             st.title('')
+
+        
 #Etape 4
 elif selection == "Etape 4":
     st.title("Le système de recommandation")
