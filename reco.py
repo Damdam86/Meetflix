@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import random
 import requests
-from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies, get_random_backdrops
+from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies, get_random_backdrops, user_define_weights
 
 # API key
 api_key = st.secrets["API_KEY"]
@@ -180,17 +180,6 @@ with col1:
     # Récupérer l'ID du film sélectionné
     selected_movie_id = data[data['title'] == selected_movie_title]['id'].values[0]
 
-    def user_define_weights():
-        with st.expander("Ajustez les poids des variables", expanded=False):
-            vote_average_weight = st.select_slider("Poids pour 'vote_average'", options=range(1, 6), value=2)
-            vote_count_weight = st.select_slider("Poids pour 'vote_count'", options=range(1, 6), value=1)
-            genre_weight = st.select_slider("Poids pour 'genres'", options=range(1, 6), value=3)
-            return {
-        'vote_average': vote_average_weight,
-        'vote_count': vote_count_weight,
-        'genres': genre_weight
-        }
-        
     weights = user_define_weights()
 
 
