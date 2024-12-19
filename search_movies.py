@@ -14,7 +14,7 @@ st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 api_key =st.secrets['API_KEY']
 
 # Chargements des données via load_and_prepare_data
-data, numerical_features, genres_dummies, cast_dummies, keywords_dummies, all_keywords = load_and_prepare_data()
+data, numerical_features, genres_dummies, cast_dummies, keywords_dummies = load_and_prepare_data()
 
 # Fonction pour récupérer les films
 @st.cache_data

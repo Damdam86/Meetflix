@@ -19,7 +19,7 @@ api_key = st.secrets['API_KEY']
 # On load les datas (recoltées par l'API TMDB)
 @st.cache_data
 def load_data():
-    file_path = 'https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'
+    file_path = 'https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'
     df = pd.read_csv(file_path, sep=',')
     return df
 
@@ -47,7 +47,7 @@ def load_and_prepare_keywords():
 
 # Chargement et préparation des données
 @st.cache_data
-def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'):
+def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'):
     # Chargement du dataset et convertion des colonne ['genres'] et ['cast'] en dictionnaires, ['origin_country'] en list
     data = dtt.csv_to_df(file_path)
     # Chargement des mots-clés nettoyés
@@ -55,14 +55,6 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
 
     # Créer une nouvelle colonne contenant une liste de mmots clés par film
     data['keywords_cleaned_str'] = df_words['keywords_cleaned'].apply(lambda x: '|'.join(x))
-
-    # Extraire tous les mots-clés uniques
-    all_keywords = set(
-        keyword.strip()
-        for keywords in data['keywords']
-        for keyword in keywords.split('|')
-    )
-    all_keywords = sorted(all_keywords)  # Trier les mots-clés
 
     # Créer une nouvelle colonne contenant uniquement les noms des genres
     data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
@@ -79,7 +71,7 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     # Sélectionner les colonnes numériques
     numerical_features = data[['vote_average', 'vote_count', 'popularity']]
 
-    return data, numerical_features, genres_dummies, cast_dummies, keywords_dummies, all_keywords
+    return data, numerical_features, genres_dummies, cast_dummies, keywords_dummies
 
 def user_define_weights():
         with st.expander("Ajustez les poids des variables", expanded=False):

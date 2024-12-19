@@ -118,7 +118,7 @@ else:
     st.error("Aucun backdrop disponible pour afficher le carrousel.")
 
 # Chargement et préparation des données
-data, numerical_features, genres_dummies, cast_dummies, keywords_dummies, all_keywords = load_and_prepare_data()
+data, numerical_features, genres_dummies, cast_dummies, keywords_dummies = load_and_prepare_data()
 
 # Création et entraînement du pipeline
 pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, keywords_dummies)
