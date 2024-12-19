@@ -130,7 +130,7 @@ with col3:
     selected_keywords = st.multiselect("Filtrez par mots clés :", all_keywords)
     selected_vote_average = st.slider("Sélectionner une plage de vote", min_vote_average, max_vote_average, (min_vote_average, max_vote_average))
 
-    if selected_genre or selected_year or selected_vote_average :
+    if selected_genre or selected_year or selected_vote_average or selected_keywords :
         df_movie_filtered = dtt.get_filtered_df(movies_list, genres = selected_genre, min_year = selected_year[0], max_year = selected_year[1], min_vote_average = selected_vote_average[0], max_vote_average = selected_vote_average[1])
 
 st.title("") # Texte de séparation
