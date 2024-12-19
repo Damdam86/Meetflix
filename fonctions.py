@@ -8,37 +8,35 @@ import streamlit as st
 import random
 import df_tmdb_tool as dtt
 
-
 api_key = st.secrets['API_KEY']
 
 # On load les datas (recoltées par l'API TMDB)
 @st.cache_data
 def load_data():
-    file_path = 'https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'
+    file_path = 'https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'
     df = pd.read_csv(file_path, sep=',')
     return df
 
-#On load les keyswords générés par OpenAI
-@st.cache_data
-def get_keywords(data):
-    file_path = ''
-    df_keywords = pd.read_csv(file_path, sep=',')
-    all_keywords = []
-    for keywords in data['keywords'].dropna():
-        keywords_list = ast.literal_eval(keywords)
-        all_keywords.extend([kw['name'] for kw in keywords_list])
-    return all_keywords
-
+def clean_keywords(keywords, stop_words):
+    return [
+        word.lower().strip()
+        for word in keywords
+        if word.isalpha() and word.lower() not in stop_words
+    ]
 
 # Chargement et préparation des données
 @st.cache_data
-def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'):
+def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'):
     # Chargement du dataset et convertion des colonne ['genres'] et ['cast'] en dictionnaires, ['origin_country'] en list
     data = dtt.csv_to_df(file_path)
+
     # Créer une nouvelle colonne contenant uniquement les noms des genres
     data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
     # Créer une nouvelle colonne contenant uniquement les noms des 5 acteurs principaux
     data['cast_names'] = data['cast'].apply(lambda persons: [person['name'] for person in persons[:5]] if persons else [])
+
+    # Utiliser `get_dummies` pour créer des colonnes de mots clés
+    keywords_dummies = data['keywords'].str.get_dummies()
     # Utiliser `get_dummies` pour créer des colonnes de genres
     genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
     # Utiliser `get_dummies` pour créer des colonnes de cast
@@ -47,7 +45,7 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     # Sélectionner les colonnes numériques
     numerical_features = data[['vote_average', 'vote_count', 'popularity']]
 
-    return data, numerical_features, genres_dummies, cast_dummies
+    return data, numerical_features, genres_dummies, cast_dummies, keywords_dummies
 
 def user_define_weights():
         with st.expander("Ajustez les poids des variables", expanded=False):
@@ -62,7 +60,7 @@ def user_define_weights():
 
 # Préparation du pipeline KNN
 @st.cache_data
-def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, weights=None):
+def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, keywords_dummies, weights=None):
     # Définir les poids par défaut pour chaque variable
     if weights is None:
         weights = {
@@ -95,10 +93,11 @@ def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, 
     numerical_features_scaled_df.reset_index(drop=True, inplace=True)
     genres_weighted.reset_index(drop=True, inplace=True)
     cast_dummies.reset_index(drop=True, inplace=True)
+    keywords_dummies.reset_index(drop=True, inplace=True)
     
 
     # Concaténation de l'ensemble des données (numerique + genre)
-    X_extended = pd.concat([numerical_features_scaled_df, genres_weighted, cast_dummies], axis=1)
+    X_extended = pd.concat([numerical_features_scaled_df, genres_weighted, cast_dummies, keywords_dummies], axis=1)
     print(X_extended)
 
     # Préparation du pipeline pour le modèle KNN
@@ -113,7 +112,7 @@ def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, 
 
 
 # Fonction de recommandation
-def recommend_movies(movie_id, data, X_extended, pipeline, numerical_features, genres_dummies, cast_dummies):
+def recommend_movies(movie_id, data, X_extended, pipeline, numerical_features, genres_dummies, cast_dummies, keywords_dummies):
     # Vérifier si l'ID du film existe dans les données
     if not data['id'].isin([movie_id]).any():
         return []

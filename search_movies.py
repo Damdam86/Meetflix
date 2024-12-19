@@ -13,6 +13,9 @@ st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 # Clé API (remplacez par votre propre clé valide)
 api_key =st.secrets['API_KEY']
 
+# Chargements des données via load_and_prepare_data
+data, numerical_features, genres_dummies, cast_dummies, keywords_dummies = load_and_prepare_data()
+
 # Fonction pour récupérer les films
 @st.cache_data
 def get_movies():
@@ -103,9 +106,10 @@ if "visible_movies" not in st.session_state:
 
 # Récupération des films
 movies_list = df_tmdb 
-df_movie_filtered = df_tmdb 
+df_movie_filtered = df_tmdb
 
 genres = dtt.get_all_genre_names()  # Récupération des genres
+keywords = dtt.get_all_keywords(df_tmdb)
 
 most_older_year = dtt.get_most_older_year(movies_list)
 most_recent_year = dtt.get_most_recent_year(movies_list)
@@ -124,11 +128,11 @@ with col2: #Colonne de séparation
     st.title("")
 
 with col3: 
-    selected_keywords = st.multiselect("Filtrez par mots clés :", genres)
+    selected_keywords = st.multiselect("Filtrez par mots clés :", keywords)
     selected_vote_average = st.slider("Sélectionner une plage de vote", min_vote_average, max_vote_average, (min_vote_average, max_vote_average))
 
-    if selected_genre or selected_year or selected_vote_average:
-        df_movie_filtered = dtt.get_filtered_df(movies_list, genres = selected_genre, min_year = selected_year[0], max_year = selected_year[1], min_vote_average = selected_vote_average[0], max_vote_average = selected_vote_average[1])
+    if selected_genre or selected_year or selected_vote_average or selected_keywords :
+        df_movie_filtered = dtt.get_filtered_df(movies_list, genres = selected_genre, min_year = selected_year[0], max_year = selected_year[1], min_vote_average = selected_vote_average[0], max_vote_average = selected_vote_average[1], keywords = selected_keywords)
 
 st.title("") # Texte de séparation
 
