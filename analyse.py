@@ -10,6 +10,8 @@ import nbformat
 from nbconvert import HTMLExporter
 from fonctions import load_data
 import ast
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
 # Chargement des données
@@ -131,7 +133,7 @@ elif selection == "Etape 3":
                     width=1250,
                     margin=dict(l=50, r=50, t=50, b=150)
         )   
-             fig1.show()
+             st.plotly_chart(fig1, use_container_width=True)
 
     with tab2:
         # Affichage côte à côte dans Streamlit
@@ -143,21 +145,100 @@ elif selection == "Etape 3":
 
             fig2 = px.line(yearly_movies.sort_values('Année'), x='Année', y='Nombre de films', title="Évolution des sorties de films par année")
             fig2.update_traces(line=dict(color='indigo'))  
-            fig2.show()
-            st.plotly_chart(fig1, use_container_width=True)
-        with col2:
             st.plotly_chart(fig2, use_container_width=True)
+        with col2:
+            st.plotly_chart(fig1, use_container_width=True)
 
     with tab3:
-        st.header("Pays")
-        # Affichage côte à côte dans Streamlit
+        st.header("Durée")
         col1, col2 = st.columns(2)
-        with col1:
-             st.title('')
-        with col2:
-             st.title('')
+        with col1:          
+            df_cleaned = df.dropna(subset=['runtime'])
+            fig3 = make_subplots(
+                rows=1, cols=2,
+                subplot_titles=("Histogramme des Durées", "Boîte à Moustaches des Durées"),
+                column_widths=[0.5, 0.5]  
+        ) 
+            fig3.add_trace(
+                go.Histogram(
+                x=df_cleaned['runtime'],
+                nbinsx=30,
+                name="Histogramme",
+                marker_color='indigo'
+            ),
+            row=1, col=1
+    )
+# Ajouter la boîte à moustaches au sous-graphique 2
+            fig3.add_trace(
+                go.Box(
+                y=df_cleaned['runtime'],
+                name="distribution des durées des films",
+                marker_color='indigo'
+            ),
+            row=1, col=2
+    )
+            fig3.update_yaxes(tickprefix='min ', row=1, col=2)
 
+            fig3.update_layout(
+            title="Distribution des Durées des Films",
+            xaxis_title="Durée des films (minutes)",
+            yaxis_title="Fréquence",
+            showlegend=False,
+            height=600
+    )
+            st.plotly_chart(fig3, use_container_width=True)
+
+        with col2:
         
+            top_10_longest = df[['title', 'runtime']].sort_values(by='runtime', ascending=False).head(10)
+            top_10_shortest = df[['title', 'runtime']].sort_values(by='runtime').head(10)
+
+# Bar chart : Films les plus longs
+            fig4 = px.bar(top_10_longest, x='title', y='runtime',
+                title="Top 10 des films les plus longs", labels={'title': 'Titre des films', 'runtime': 'Durée (min)'}, color_discrete_sequence=['indigo'])
+            fig4.update_xaxes(tickangle=45)
+            st.plotly_chart(fig4, use_container_width=True)
+
+# Bar chart : Films les plus courts
+            fig5 = px.bar(top_10_shortest, x='title', y='runtime',
+              title="Top 10 des films les plus courts", labels={'title': 'Titre des films', 'runtime': 'Durée (min)'}, color_discrete_sequence=['yellow'])
+            fig5.update_xaxes(tickangle=45)
+            st.plotly_chart(fig5, use_container_width=True)
+
+        with tab4:
+            st.header("Pays")
+            col1, col2 = st.columns(2)
+        with col1:          
+            df['origin_country'] = df['origin_country'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+            countries_expanded = df.explode('origin_country')
+
+# Compter le nombre de films par pays
+            country_counts = countries_expanded['origin_country'].value_counts().reset_index()
+            country_counts.columns = ['country', 'count']
+
+            top_5_countries = country_counts.head(5)
+            autres_count = country_counts.iloc[5:]['count'].sum()
+
+            autres_row = pd.DataFrame({
+                'country': ['Autres'],
+                'count': [autres_count]
+            })
+            top_5_with_autres = pd.concat([top_5_countries, autres_row], ignore_index=True)
+
+# Créer un graphique en anneau avec Plotly et la palette Plasma
+            custom_colors = px.colors.sequential.Plasma[:4] + ["#FFD700"]
+            fig6 = px.pie(
+                 top_5_with_autres,
+                values='count',
+                names='country',
+                title="Nombre de films par pays d'origine (Top 5 + Autres)",
+                hole=0.4,  
+                color_discrete_sequence= custom_colors
+        )   
+            fig6.update_traces(textposition='inside', textinfo='percent+label')
+
+            st.plotly_chart(fig6, use_container_width=True)
+            
 #Etape 4
 elif selection == "Etape 4":
     st.title("Le système de recommandation")
