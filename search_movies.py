@@ -105,10 +105,11 @@ if "visible_movies" not in st.session_state:
     st.session_state["visible_movies"] = 20  # Commencer avec 20 films visibles
 
 # Récupération des films
-movies_list = df_tmdb 
-df_movie_filtered = df_tmdb 
+movies_list = data 
+df_movie_filtered = data 
 
 genres = dtt.get_all_genre_names()  # Récupération des genres
+keywords = all_keywords
 
 most_older_year = dtt.get_most_older_year(movies_list)
 most_recent_year = dtt.get_most_recent_year(movies_list)
@@ -127,7 +128,7 @@ with col2: #Colonne de séparation
     st.title("")
 
 with col3: 
-    selected_keywords = st.multiselect("Filtrez par mots clés :", all_keywords)
+    selected_keywords = st.multiselect("Filtrez par mots clés :", keywords)
     selected_vote_average = st.slider("Sélectionner une plage de vote", min_vote_average, max_vote_average, (min_vote_average, max_vote_average))
 
     if selected_genre or selected_year or selected_vote_average or selected_keywords :

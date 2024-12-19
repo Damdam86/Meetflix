@@ -59,7 +59,7 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     # Extraire tous les mots-clés uniques
     all_keywords = set(
         keyword.strip()
-        for keywords in data['keywords_cleaned_str']
+        for keywords in data['keywords']
         for keyword in keywords.split('|')
     )
     all_keywords = sorted(all_keywords)  # Trier les mots-clés
@@ -70,7 +70,7 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     data['cast_names'] = data['cast'].apply(lambda persons: [person['name'] for person in persons[:5]] if persons else [])
 
     # Utiliser `get_dummies` pour créer des colonnes de mots clés
-    keywords_dummies = data['keywords_cleaned_str'].str.get_dummies(sep='|')
+    keywords_dummies = data['keywords'].str.get_dummies(sep='|')
     # Utiliser `get_dummies` pour créer des colonnes de genres
     genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
     # Utiliser `get_dummies` pour créer des colonnes de cast
