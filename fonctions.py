@@ -7,6 +7,11 @@ import requests
 import streamlit as st
 import random
 import df_tmdb_tool as dtt
+import nltk
+nltk.download('popular')
+nltk.download('punkt_tab')
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
 
 api_key = st.secrets['API_KEY']
@@ -18,27 +23,54 @@ def load_data():
     df = pd.read_csv(file_path, sep=',')
     return df
 
+def clean_keywords(keywords, stop_words):
+    return [
+        word.lower().strip()
+        for word in keywords
+        if word.isalpha() and word.lower() not in stop_words
+    ]
+
 #On load les keyswords générés par OpenAI
 @st.cache_data
-def get_keywords(data):
-    file_path = ''
-    df_keywords = pd.read_csv(file_path, sep=',')
-    all_keywords = []
-    for keywords in data['keywords'].dropna():
-        keywords_list = ast.literal_eval(keywords)
-        all_keywords.extend([kw['name'] for kw in keywords_list])
-    return all_keywords
-
+def load_and_prepare_keywords():
+    file_path = 'source/source_keywords.csv'
+    df_words = pd.read_csv(file_path)
+    # Récupérer les stopwords pour le français
+    stop_words = set(stopwords.words('french'))
+    # Convertir les chaînes de caractères en listes Python
+    df_words['keywords'] = df_words['keywords'].apply(ast.literal_eval)
+    # Nettoyer les mots-clés
+    df_words['keywords_cleaned'] = df_words['keywords'].apply(
+        lambda keywords: clean_keywords(keywords, stop_words)
+    )
+    return df_words
 
 # Chargement et préparation des données
 @st.cache_data
 def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list.csv'):
     # Chargement du dataset et convertion des colonne ['genres'] et ['cast'] en dictionnaires, ['origin_country'] en list
     data = dtt.csv_to_df(file_path)
+    # Chargement des mots-clés nettoyés
+    df_words = load_and_prepare_keywords()
+
+    # Créer une nouvelle colonne contenant une liste de mmots clés par film
+    data['keywords_cleaned_str'] = df_words['keywords_cleaned'].apply(lambda x: '|'.join(x))
+
+    # Extraire tous les mots-clés uniques
+    all_keywords = set(
+        keyword.strip()
+        for keywords in data['keywords_cleaned_str']
+        for keyword in keywords.split('|')
+    )
+    all_keywords = sorted(all_keywords)  # Trier les mots-clés
+
     # Créer une nouvelle colonne contenant uniquement les noms des genres
     data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
     # Créer une nouvelle colonne contenant uniquement les noms des 5 acteurs principaux
     data['cast_names'] = data['cast'].apply(lambda persons: [person['name'] for person in persons[:5]] if persons else [])
+
+    # Utiliser `get_dummies` pour créer des colonnes de mots clés
+    keywords_dummies = data['keywords_cleaned_str'].str.get_dummies(sep='|')
     # Utiliser `get_dummies` pour créer des colonnes de genres
     genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
     # Utiliser `get_dummies` pour créer des colonnes de cast
@@ -47,7 +79,7 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     # Sélectionner les colonnes numériques
     numerical_features = data[['vote_average', 'vote_count', 'popularity']]
 
-    return data, numerical_features, genres_dummies, cast_dummies
+    return data, numerical_features, genres_dummies, cast_dummies, keywords_dummies, all_keywords
 
 def user_define_weights():
         with st.expander("Ajustez les poids des variables", expanded=False):
@@ -62,7 +94,7 @@ def user_define_weights():
 
 # Préparation du pipeline KNN
 @st.cache_data
-def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, weights=None):
+def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, keywords_dummies, weights=None):
     # Définir les poids par défaut pour chaque variable
     if weights is None:
         weights = {
@@ -95,10 +127,11 @@ def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, 
     numerical_features_scaled_df.reset_index(drop=True, inplace=True)
     genres_weighted.reset_index(drop=True, inplace=True)
     cast_dummies.reset_index(drop=True, inplace=True)
+    keywords_dummies.reset_index(drop=True, inplace=True)
     
 
     # Concaténation de l'ensemble des données (numerique + genre)
-    X_extended = pd.concat([numerical_features_scaled_df, genres_weighted, cast_dummies], axis=1)
+    X_extended = pd.concat([numerical_features_scaled_df, genres_weighted, cast_dummies, keywords_dummies], axis=1)
     print(X_extended)
 
     # Préparation du pipeline pour le modèle KNN
@@ -113,7 +146,7 @@ def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, 
 
 
 # Fonction de recommandation
-def recommend_movies(movie_id, data, X_extended, pipeline, numerical_features, genres_dummies, cast_dummies):
+def recommend_movies(movie_id, data, X_extended, pipeline, numerical_features, genres_dummies, cast_dummies, keywords_dummies):
     # Vérifier si l'ID du film existe dans les données
     if not data['id'].isin([movie_id]).any():
         return []

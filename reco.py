@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import random
 import requests
-from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies, get_random_backdrops, user_define_weights
+from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies, get_random_backdrops, user_define_weights, load_and_prepare_keywords
 
 # API key
 api_key = st.secrets["API_KEY"]
@@ -118,10 +118,10 @@ else:
     st.error("Aucun backdrop disponible pour afficher le carrousel.")
 
 # Chargement et préparation des données
-data, numerical_features, genres_dummies, cast_dummies = load_and_prepare_data()
+data, numerical_features, genres_dummies, cast_dummies, keywords_dummies, all_keywords = load_and_prepare_data()
 
 # Création et entraînement du pipeline
-pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies)
+pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, keywords_dummies)
 
 # Récupérer les films actuellement au cinéma
 now_playing_url = f"https://api.themoviedb.org/3/movie/now_playing?language=fr-FR&page=1&api_key={api_key}"
@@ -221,7 +221,7 @@ st.markdown("# Les films les plus populaires")
 # Vérifier si la liste est vide
 if movies_top_rated:
     cols = st.columns(6)
-    for i, movie in enumerate(movies_top_rated):
+    for i, movie in enumerate(movies_top_rated[:6]):
         with cols[i % 6]:
             # Vérifier si le poster existe
             poster_path = movie.get('poster_path')
@@ -240,3 +240,32 @@ if movies_top_rated:
             """, unsafe_allow_html=True)
 else:
     st.warning("Aucun film populaire trouvé.")
+
+
+# Diviser les recommandations en colonnes pour une meilleure lisibilité
+cols = st.columns(5)  # Création de 5 colonnes pour l'affichage en ligne
+# Filtrer les films français
+top_french_movie = data[data['origin_country'].apply(lambda x: 'FR' in x if isinstance(x, list) else False)]
+# Vérifier si des films français sont disponibles
+st.markdown("# Les films français")
+if top_french_movie.empty:
+    st.warning("Aucun film français trouvé.")
+else:
+    # Diviser en colonnes et afficher les 6 premiers films
+    cols = st.columns(6)  # 5 colonnes pour l'affichage
+    for i, (_, movie) in enumerate(top_french_movie.head(6).iterrows()):
+        with cols[i % 6]:  # Afficher dans les colonnes
+            # Vérifier si le poster existe
+            poster_path = movie['poster_path']
+            poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}" if pd.notna(poster_path) else "https://via.placeholder.com/200x300.png?text=Aucune+affiche"
+
+            # Affichage du film
+            st.markdown(f"""
+                <div class='movie-card'>
+                    <a href="/movie?movie_id={movie['id']}" style="text-decoration: none; color: inherit;" target="_self">
+                    <img src='{poster_url}' class='movie-poster'>
+                    <p>{movie['title']}</p>
+                    <p class='movie-meta'>⭐ {movie['vote_average']}/10</p>
+                    </a>
+                </div>
+            """, unsafe_allow_html=True)

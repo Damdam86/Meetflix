@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 import ast
-from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies
+from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies, load_and_prepare_keywords
 import df_tmdb_tool as dtt
 from data_manager import df_tmdb
 
@@ -12,6 +12,9 @@ st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 
 # Clé API (remplacez par votre propre clé valide)
 api_key =st.secrets['API_KEY']
+
+# Chargements des données via load_and_prepare_data
+data, numerical_features, genres_dummies, cast_dummies, keywords_dummies, all_keywords = load_and_prepare_data()
 
 # Fonction pour récupérer les films
 @st.cache_data
@@ -124,10 +127,10 @@ with col2: #Colonne de séparation
     st.title("")
 
 with col3: 
-    selected_keywords = st.multiselect("Filtrez par mots clés :", genres)
+    selected_keywords = st.multiselect("Filtrez par mots clés :", all_keywords)
     selected_vote_average = st.slider("Sélectionner une plage de vote", min_vote_average, max_vote_average, (min_vote_average, max_vote_average))
 
-    if selected_genre or selected_year or selected_vote_average:
+    if selected_genre or selected_year or selected_vote_average :
         df_movie_filtered = dtt.get_filtered_df(movies_list, genres = selected_genre, min_year = selected_year[0], max_year = selected_year[1], min_vote_average = selected_vote_average[0], max_vote_average = selected_vote_average[1])
 
 st.title("") # Texte de séparation
