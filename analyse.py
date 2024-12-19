@@ -136,19 +136,14 @@ elif selection == "Etape 3":
              st.plotly_chart(fig1, use_container_width=True)
 
     with tab2:
-        # Affichage côte à côte dans Streamlit
-        col1, col2 = st.columns(2)
-        with col1:
-            st.header("Années")
-            yearly_movies = df['release_date'].value_counts().reset_index()
-            yearly_movies.columns = ['Année', 'Nombre de films']
+        st.header("Années")
+        yearly_movies = df['release_date'].value_counts().reset_index()
+        yearly_movies.columns = ['Année', 'Nombre de films']
 
-            fig2 = px.line(yearly_movies.sort_values('Année'), x='Année', y='Nombre de films', title="Évolution des sorties de films par année")
-            fig2.update_traces(line=dict(color='indigo'))  
-            st.plotly_chart(fig2, use_container_width=True)
-        with col2:
-            st.plotly_chart(fig1, use_container_width=True)
-
+        fig2 = px.line(yearly_movies.sort_values('Année'), x='Année', y='Nombre de films', title="Évolution des sorties de films par année")
+        fig2.update_traces(line=dict(color='indigo'))  
+        st.plotly_chart(fig2, use_container_width=True)
+       
     with tab3:
         st.header("Durée")
         col1, col2 = st.columns(2)
