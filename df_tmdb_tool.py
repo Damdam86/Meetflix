@@ -185,7 +185,7 @@ def get_df_with_origin_country(df_tmdb : pd.DataFrame, origin_country : List[str
 
 # return a dataframe of movies that contain the origin countries given in parameter 
 def get_df_with_keywords(df_tmdb : pd.DataFrame, keywords : List[str]) -> pd.DataFrame : 
-    return df_tmdb[df_tmdb['keywords'].apply(lambda x: all(k in keywords for k in x))]
+    return df_tmdb[df_tmdb['keywords'].apply(lambda x: all(k in x for k in keywords))]
     
 # return a dataframe of movies using the filters given in parameter     
 def get_filtered_df(df_tmdb : pd.DataFrame, 
