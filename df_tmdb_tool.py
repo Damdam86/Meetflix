@@ -91,6 +91,7 @@ def eval_df(df_tmdb : pd.DataFrame) -> pd.DataFrame:
   df_tmdb['genres'] = df_tmdb['genres'].apply(eval)
   df_tmdb['origin_country'] = df_tmdb['origin_country'].apply(eval)
   df_tmdb['cast'] = df_tmdb['cast'].apply(eval)
+  df_tmdb['keywords'] = df_tmdb['keywords'].apply(eval)
   return df_tmdb
 
 # get the most older year from the column release_date
@@ -134,6 +135,14 @@ def get_all_genre_names():
     all_genres_list.append(genre['name'])
   return all_genres_list
 
+def get_all_keywords(df_tmdb : pd.DataFrame) -> List[str]:
+  all_keywords = []
+  for i, raw in df_tmdb.iterrows():
+    for keyword in raw['keywords']:
+      if keyword not in all_keywords:
+        all_keywords.append(keyword)
+  return all_keywords
+
 # return the genre id associated to the genre name given in parameter  
 def return_genre_id(genre_name : str) -> int :
   for genre in all_genres:
@@ -176,7 +185,7 @@ def get_df_with_origin_country(df_tmdb : pd.DataFrame, origin_country : List[str
 
 # return a dataframe of movies that contain the origin countries given in parameter 
 def get_df_with_keywords(df_tmdb : pd.DataFrame, keywords : List[str]) -> pd.DataFrame : 
-    return df_tmdb[df_tmdb['keywords_cleaned_str'].apply(lambda x: all(k in keywords for k in x))]
+    return df_tmdb[df_tmdb['keywords'].apply(lambda x: all(k in keywords for k in x))]
     
 # return a dataframe of movies using the filters given in parameter     
 def get_filtered_df(df_tmdb : pd.DataFrame, 

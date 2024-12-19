@@ -105,11 +105,11 @@ if "visible_movies" not in st.session_state:
     st.session_state["visible_movies"] = 20  # Commencer avec 20 films visibles
 
 # Récupération des films
-movies_list = data 
-df_movie_filtered = data 
+movies_list = df_tmdb 
+df_movie_filtered = df_tmdb
 
 genres = dtt.get_all_genre_names()  # Récupération des genres
-keywords = all_keywords
+keywords = dtt.get_all_keywords(df_tmdb)
 
 most_older_year = dtt.get_most_older_year(movies_list)
 most_recent_year = dtt.get_most_recent_year(movies_list)
