@@ -7,12 +7,6 @@ import requests
 import streamlit as st
 import random
 import df_tmdb_tool as dtt
-import nltk
-nltk.download('popular')
-nltk.download('punkt_tab')
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-
 
 api_key = st.secrets['API_KEY']
 
@@ -30,31 +24,11 @@ def clean_keywords(keywords, stop_words):
         if word.isalpha() and word.lower() not in stop_words
     ]
 
-#On load les keyswords générés par OpenAI
-@st.cache_data
-def load_and_prepare_keywords():
-    file_path = 'source/source_keywords.csv'
-    df_words = pd.read_csv(file_path)
-    # Récupérer les stopwords pour le français
-    stop_words = set(stopwords.words('french'))
-    # Convertir les chaînes de caractères en listes Python
-    df_words['keywords'] = df_words['keywords'].apply(ast.literal_eval)
-    # Nettoyer les mots-clés
-    df_words['keywords_cleaned'] = df_words['keywords'].apply(
-        lambda keywords: clean_keywords(keywords, stop_words)
-    )
-    return df_words
-
 # Chargement et préparation des données
 @st.cache_data
 def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'):
     # Chargement du dataset et convertion des colonne ['genres'] et ['cast'] en dictionnaires, ['origin_country'] en list
     data = dtt.csv_to_df(file_path)
-    # Chargement des mots-clés nettoyés
-    df_words = load_and_prepare_keywords()
-
-    # Créer une nouvelle colonne contenant une liste de mmots clés par film
-    data['keywords_cleaned_str'] = df_words['keywords_cleaned'].apply(lambda x: '|'.join(x))
 
     # Créer une nouvelle colonne contenant uniquement les noms des genres
     data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
@@ -62,7 +36,7 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     data['cast_names'] = data['cast'].apply(lambda persons: [person['name'] for person in persons[:5]] if persons else [])
 
     # Utiliser `get_dummies` pour créer des colonnes de mots clés
-    keywords_dummies = data['keywords'].str.get_dummies(sep='|')
+    keywords_dummies = data['keywords'].str.get_dummies()
     # Utiliser `get_dummies` pour créer des colonnes de genres
     genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
     # Utiliser `get_dummies` pour créer des colonnes de cast

@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 import ast
-from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies, load_and_prepare_keywords
+from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies
 import df_tmdb_tool as dtt
 from data_manager import df_tmdb
 
@@ -121,7 +121,6 @@ max_vote_average = dtt.get_max_vote_average(movies_list)
 col1, col2, col3 = st.columns([4,1,4])
 
 with col1: 
-    st.dataframe(data=movies_list)
     selected_genre = st.multiselect("Filtrez par genre :", genres)
     selected_year = st.slider("Sélectionner une plage d'années", most_older_year, most_recent_year, (most_older_year, most_recent_year))
 

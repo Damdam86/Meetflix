@@ -5,7 +5,7 @@ from fonctions import load_and_prepare_data, create_and_train_pipeline, recommen
 ############################ Chargement des données, poids des variables, entrainement de la recommandation ############################################################
 
 # Chargement et préparation des données
-data, numerical_features, genres_dummies, cast_dummies, keywords_dummies, all_keywords = load_and_prepare_data()
+data, numerical_features, genres_dummies, cast_dummies, keywords_dummies = load_and_prepare_data()
 
 ##################################################################### ID MOVIES dans la barre de navigation ###########################################################
 

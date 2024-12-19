@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import random
 import requests
-from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies, get_random_backdrops, user_define_weights, load_and_prepare_keywords
+from fonctions import load_and_prepare_data, create_and_train_pipeline, recommend_movies, get_random_backdrops, user_define_weights
 
 # API key
 api_key = st.secrets["API_KEY"]
