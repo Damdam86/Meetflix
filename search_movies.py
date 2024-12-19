@@ -147,7 +147,7 @@ film = 0
 for line in range(0,nb_line,1):
         cols = st.columns(column_number_page)
         for col in cols:
-            if film >= visible_movies:
+            if film >= visible_movies or len(df_movie_filtered) <= film:
                 break
             with col:
                 movie = df_movie_filtered.iloc[film]
