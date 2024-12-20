@@ -3,6 +3,9 @@ import pandas as pd
 import plotly.express as px
 import streamlit_antd_components as sac
 import streamlit.components.v1 as components
+from fonctions import cinema_creuse
+
+coords_cinema, df_cinema = cinema_creuse()
 
 # Titre de la page
 st.markdown("""
@@ -31,6 +34,8 @@ with col2:
     st.markdown("## 🏢 Votre métier")
     st.write("Cinéma situé dans la Creuse.")
 
+st.map(df_cinema,)
+
 
 # Livraison
 st.divider()
@@ -52,7 +57,7 @@ components.html(
     <br>
     <br>
     """,
-    height=300  # Ajustez la hauteur selon vos besoins
+    height=400  # Ajustez la hauteur selon vos besoins
 )
 progress_text = "Avancement du projet"
 my_bar = st.progress(0.4, text=progress_text)  
@@ -82,26 +87,3 @@ retroplanning = {
 df_retroplanning = pd.DataFrame(retroplanning)
 
 st.write(df_retroplanning)
-
-# Détails du système de recommandation avec conteneur de fond et icônes
-st.divider()
-st.header("🔧 Détails du Système de Recommandation")
-st.write("Le tableau ci-dessous présente les principales caractéristiques de notre système de recommandation.")
-
-system_features = {
-    "Caractéristique": [
-        "🎯 Personnalisation",
-        "🌐 Utilisation de données externes",
-        "👥 Filtrage collaboratif",
-        "📑 Filtrage basé sur le contenu"
-    ],
-    "Description": [
-        "Recommandations personnalisées basées sur les préférences des utilisateurs",
-        "Utilisation de données externes pour pallier l'absence de données internes",
-        "Suggestions basées sur les préférences d'autres utilisateurs",
-        "Recommandations basées sur les caractéristiques des films"
-    ],
-    "Statut": ["🛠️", "✅", "🛠️", "📅"]
-}
-df_system_features = pd.DataFrame(system_features)
-st.write(df_system_features)

@@ -243,7 +243,28 @@ elif selection == "Etape 4":
     with col1:
         st.title("KNN")
         st.text("Nous avons fait le choix de partir sur plusieurs solutions de recommandation.")
+        # Détails du système de recommandation avec conteneur de fond et icônes
+        st.divider()
+        st.header("🔧 Détails du Système de Recommandation")
+        st.write("Le tableau ci-dessous présente les principales caractéristiques de notre système de recommandation.")
 
+        system_features = {
+            "Caractéristique": [
+                "🎯 Personnalisation",
+                "🌐 Utilisation de données externes",
+                "👥 Filtrage collaboratif",
+                "📑 Filtrage basé sur le contenu"
+            ],
+            "Description": [
+                "Recommandations personnalisées basées sur les préférences des utilisateurs",
+                "Utilisation de données externes pour pallier l'absence de données internes",
+                "Suggestions basées sur les préférences d'autres utilisateurs",
+                "Recommandations basées sur les caractéristiques des films"
+            ],
+            "Statut": ["🛠️", "✅", "🛠️", "📅"]
+        }
+        df_system_features = pd.DataFrame(system_features)
+        st.write(df_system_features)
     with col2:
         st.title("BERT")
         st.text("Nous avons fait le choix de partir sur plusieurs solutions de recommandation.")

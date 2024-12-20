@@ -7,6 +7,10 @@ import requests
 import streamlit as st
 import random
 import df_tmdb_tool as dtt
+import requests
+import folium
+
+
 
 api_key = st.secrets['API_KEY']
 
@@ -43,18 +47,18 @@ def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie
     cast_dummies = data['cast_names'].str.join('|').str.get_dummies()
     
     # Sélectionner les colonnes numériques
-    numerical_features = data[['vote_average', 'vote_count', 'popularity']]
+    numerical_features = data[['popularity']]
 
     return data, numerical_features, genres_dummies, cast_dummies, keywords_dummies
 
 def user_define_weights():
         with st.expander("Ajustez les poids des variables", expanded=False):
-            vote_average_weight = st.select_slider("Poids pour 'vote_average'", options=range(1, 11), value=1)
-            vote_count_weight = st.select_slider("Poids pour 'vote_count'", options=range(1, 11), value=1)
+            #vote_average_weight = st.select_slider("Poids pour 'vote_average'", options=range(1, 11), value=1)
+            #vote_count_weight = st.select_slider("Poids pour 'vote_count'", options=range(1, 11), value=1)
             genre_weight = st.select_slider("Poids pour 'genres'", options=range(1, 11), value=1)
             return {
-        'vote_average': vote_average_weight,
-        'vote_count': vote_count_weight,
+        #'vote_average': vote_average_weight,
+        #'vote_count': vote_count_weight,
         'genres': genre_weight
         }
 
@@ -64,8 +68,8 @@ def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, 
     # Définir les poids par défaut pour chaque variable
     if weights is None:
         weights = {
-            'vote_average': 1,  # Plus important
-            'vote_count': 1,    # Moins important
+            #'vote_average': 1,  # Plus important
+            #'vote_count': 1,    # Moins important
             'genres': 1         # Poids pour les genres
         }
 
@@ -102,7 +106,7 @@ def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, 
 
     # Préparation du pipeline pour le modèle KNN
     pipeline = Pipeline([
-        ('knn', NearestNeighbors(n_neighbors=26))  # KNN uniquement
+        ('knn', NearestNeighbors(n_neighbors=26, metric='minkowski'))  # KNN uniquement
     ])
 
     # Entraînement du modèle KNN
@@ -212,3 +216,34 @@ def get_movies_with_person_id(df: pd.DataFrame, actor_dico: pd.DataFrame, person
     df_movies = df[df['id'].isin(movie_ids)].copy()
 
     return df_movies
+
+
+def cinema_creuse():
+    dic_cinema = {'Cinéma Claude Miller' : 'Place du Mail 23400 Bourganeuf',
+              'Cinéma Alpha':'rue de Rentiere 23110 Évaux-les-Bains',
+              'Eden':'4 place Saint Jacques 23300 La Souterraine',
+              'Le Colbert':'50, Grande-Rue 23200 Aubusson',
+              'Le Sénéchal':'1, rue du Sénéchal 23000 Guéret'}
+    link_main = 'https://api-adresse.data.gouv.fr/search/?q='
+    
+    coords_cinema = {}
+
+    for nom, adresse in dic_cinema.items() :
+        params = {
+        "q" : adresse,
+        "format" : "json",
+        "limit" : 1
+    }
+        Response = requests.get(link_main, params=params)
+        if Response.status_code == 200 :
+            data=Response.json()
+            coords_cinema[nom] = data['features'][0]['geometry']['coordinates'][::-1]
+
+    cinema_data = {
+        'Nom': list(coords_cinema.keys()),
+        'lat': [coord[0] if coord else None for coord in coords_cinema.values()],
+        'lon': [coord[1] if coord else None for coord in coords_cinema.values()]
+    }
+    df_cinema = pd.DataFrame(cinema_data)
+
+    return coords_cinema, df_cinema
