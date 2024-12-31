@@ -13,12 +13,12 @@ import folium
 
 
 api_key = st.secrets['API_KEY']
+file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'
 
 # On load les datas (recoltées par l'API TMDB)
 @st.cache_data
 def load_data():
-    file_path = 'https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'
-    df = pd.read_csv(file_path, sep=',')
+    df = dtt.csv_to_df(file_path)
     return df
 
 def clean_keywords(keywords, stop_words):
@@ -30,9 +30,9 @@ def clean_keywords(keywords, stop_words):
 
 # Chargement et préparation des données
 @st.cache_data
-def load_and_prepare_data(file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'):
+def load_and_prepare_data():
     # Chargement du dataset et convertion des colonne ['genres'] et ['cast'] en dictionnaires, ['origin_country'] en list
-    data = dtt.csv_to_df(file_path)
+    data = load_data()
 
     # Créer une nouvelle colonne contenant uniquement les noms des genres
     data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])

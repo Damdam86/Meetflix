@@ -4,8 +4,10 @@ import plotly.express as px
 import streamlit_antd_components as sac
 import streamlit.components.v1 as components
 from fonctions import cinema_creuse
+from fonctions import load_data
 
 coords_cinema, df_cinema = cinema_creuse()
+df = load_data()
 
 # Titre de la page
 st.markdown("""
