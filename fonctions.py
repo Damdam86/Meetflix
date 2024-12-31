@@ -8,17 +8,20 @@ import streamlit as st
 import random
 import df_tmdb_tool as dtt
 import requests
-import folium
+#import folium
 
 
 
 api_key = st.secrets['API_KEY']
-file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'
+tmdb_file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'
+keywords_dummies_file_path='https://sevlacgames.com/tmdb/keywords_dummies.csv'
+genres_dummies_file_path='https://sevlacgames.com/tmdb/genres_dummies.csv'
+cast_dummies_file_path='https://sevlacgames.com/tmdb/cast_dummies.csv'
 
 # On load les datas (recoltées par l'API TMDB)
 @st.cache_data
 def load_data():
-    df = dtt.csv_to_df(file_path)
+    df = dtt.csv_to_df(tmdb_file_path)
     return df
 
 def clean_keywords(keywords, stop_words):
@@ -35,16 +38,19 @@ def load_and_prepare_data():
     data = load_data()
 
     # Créer une nouvelle colonne contenant uniquement les noms des genres
-    data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
+    #data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
     # Créer une nouvelle colonne contenant uniquement les noms des 5 acteurs principaux
-    data['cast_names'] = data['cast'].apply(lambda persons: [person['name'] for person in persons[:5]] if persons else [])
+    #data['cast_names'] = data['cast'].apply(lambda persons: [person['name'] for person in persons[:5]] if persons else [])
 
     # Utiliser `get_dummies` pour créer des colonnes de mots clés
-    keywords_dummies = data['keywords'].str.get_dummies()
+    #keywords_dummies = data['keywords'].str.get_dummies()
+    keywords_dummies = pd.read_csv(keywords_dummies_file_path)
     # Utiliser `get_dummies` pour créer des colonnes de genres
-    genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
+    #genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
+    genres_dummies = pd.read_csv(genres_dummies_file_path)
     # Utiliser `get_dummies` pour créer des colonnes de cast
-    cast_dummies = data['cast_names'].str.join('|').str.get_dummies()
+    #cast_dummies = data['cast_names'].str.join('|').str.get_dummies()
+    cast_dummies = pd.read_csv(cast_dummies_file_path)
     
     # Sélectionner les colonnes numériques
     numerical_features = data[['popularity']]
