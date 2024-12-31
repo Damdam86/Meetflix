@@ -273,6 +273,9 @@ elif selection == "Etape 4":
 #Etape 5
 elif selection == "Etape 5":
     st.header("Result DataFrame")
-    df['genres'] = df['genres'].apply(lambda lst: [str(item) for item in lst])
-    df['cast'] = df['cast'].apply(lambda lst: [str(item) for item in lst])
+    def dict_list_to_str(lst):
+        return [", ".join(f"{k}: {v}" for k, v in d.items()) for d in lst]
+    
+    df['genres'] = df['genres'].apply(dict_list_to_str)
+    df['cast'] = df['cast'].apply(dict_list_to_str)
     st.dataframe(df)
