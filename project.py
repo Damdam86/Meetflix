@@ -5,6 +5,7 @@ import streamlit_antd_components as sac
 import streamlit.components.v1 as components
 from fonctions import cinema_creuse
 from fonctions import load_data
+import asyncio
 
 coords_cinema, df_cinema = cinema_creuse()
 df = load_data()
