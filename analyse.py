@@ -12,6 +12,7 @@ from fonctions import load_data
 import ast
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import json
 
 
 # Chargement des données
@@ -272,4 +273,6 @@ elif selection == "Etape 4":
 #Etape 5
 elif selection == "Etape 5":
     st.header("Result DataFrame")
+    df['genres'] = df['genres'].apply(lambda x: json.dumps(x, indent=2))
+    df['cast'] = df['cast'].apply(lambda x: json.dumps(x, indent=2))
     st.dataframe(df)
