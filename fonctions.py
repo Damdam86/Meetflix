@@ -8,7 +8,6 @@ import streamlit as st
 import random
 import df_tmdb_tool as dtt
 import requests
-import asyncio
 import folium
 
 
@@ -18,7 +17,7 @@ file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'
 
 # On load les datas (recoltées par l'API TMDB)
 @st.cache_data
-async def load_data():
+def load_data():
     df = dtt.csv_to_df(file_path)
     return df
 
