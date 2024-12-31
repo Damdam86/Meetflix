@@ -273,6 +273,6 @@ elif selection == "Etape 4":
 #Etape 5
 elif selection == "Etape 5":
     st.header("Result DataFrame")
-    df['genres'] = df['genres'].apply(lambda x: json.dumps(x, indent=2))
-    df['cast'] = df['cast'].apply(lambda x: json.dumps(x, indent=2))
+    df['genres'] = df['genres'].apply(lambda lst: [str(item) for item in lst])
+    df['cast'] = df['cast'].apply(lambda lst: [str(item) for item in lst])
     st.dataframe(df)
