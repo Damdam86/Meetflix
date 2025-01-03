@@ -5,7 +5,7 @@ from fonctions import load_and_prepare_data, create_and_train_pipeline, recommen
 ############################ Chargement des données, poids des variables, entrainement de la recommandation ############################################################
 
 # Chargement et préparation des données
-data, numerical_features, genres_dummies, cast_dummies, keywords_dummies = load_and_prepare_data()
+data, X_extended = load_and_prepare_data()
 
 ##################################################################### ID MOVIES dans la barre de navigation ###########################################################
 
@@ -109,7 +109,13 @@ with col2:  # Informations principales
     <button class='play-button'>▶ Voir le film</button>
     <br><br><button class='info-button'>+ Ajouter aux favoris</button>
     """, unsafe_allow_html=True)
-    st.markdown(f"**A voir sur :** ")
+    st.markdown("#### 🎥 Bande-Annonce")
+    youtube_key = data.loc[data['id'] == selected_movie_id, 'video'].values[0]
+    if youtube_key:  # Vérifier que la clé est disponible
+        youtube_url = f"https://www.youtube.com/watch?v={youtube_key}"
+        st.video(youtube_url)
+    else:
+        st.markdown("**Bande-annonce non disponible**")
 
 
 with col3:  # Résumé et détails techniques
@@ -139,8 +145,8 @@ with col3:  # Résumé et détails techniques
 st.markdown(f"#### 📸 Nos recommandations pour '{selected_movie_title}'")
 weights = user_define_weights()
 # Création et entraînement du pipeline
-pipeline, X_extended, scaler = create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, keywords_dummies, weights= weights)
-voisins = recommend_movies(selected_movie_id,data, X_extended, pipeline, numerical_features, genres_dummies, cast_dummies, keywords_dummies)
+pipeline = create_and_train_pipeline(X_extended)
+voisins = recommend_movies(selected_movie_id,data, X_extended, pipeline)
 
 # Affichage des recommandations par 5 colonnes
 cols = st.columns(5)
@@ -165,18 +171,3 @@ for i, voisin in enumerate(voisins_top_10):
             </div>
         
         """, unsafe_allow_html=True)
-        
-# Bande-annonce et avis
-col1, col2, col3 = st.columns([1, 1, 3])
-
-with col1:
-    st.markdown("#### 🎥 Bande-Annonce")
-    st.video(f'https://api.themoviedb.org/3/movie/{voisin['id']}/videos')
-    st.markdown('**Bande-annonce non disponible**')
-
-with col3:
-    st.markdown("#### 💬 Critique")
-    st.markdown('**Aucun avis disponible**')
-
-
-st.markdown("</div>", unsafe_allow_html=True)
