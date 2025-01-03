@@ -8,5 +8,4 @@ setuptools
 streamlit_antd_components
 streamlit_jupyter
 requests
-random
 folium
