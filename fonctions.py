@@ -52,7 +52,7 @@ def load_and_prepare_data():
     cast_dummies = pd.read_csv(cast_dummies_file_path)
     
     # Sélectionner les colonnes numériques
-    numerical_features = data[['popularity']]
+    numerical_features = data[['popularity', 'vote_average', 'vote_count']]
 
     return data, numerical_features, genres_dummies, cast_dummies, keywords_dummies
 
