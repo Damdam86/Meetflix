@@ -110,8 +110,6 @@ elif selection == "Etape 3":
         col1, col2 = st.columns(2)
         with col1:
              st.title('')
-        with col2:
-             st.title('')
              df['genres'] = df['genres'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
              all_genres = df.explode('genres')
              all_genres['genre_name'] = all_genres['genres'].apply(lambda x: x['name'] if isinstance(x, dict) and 'name' in x else None)
@@ -124,7 +122,8 @@ elif selection == "Etape 3":
                     y='Count',
                     color='Count',
                     title="Distribution des Genres les Plus Fréquents",
-                    labels={'Count': 'Nombre de films', 'Genre': 'Genre'}
+                    labels={'Count': 'Nombre de films', 'Genre': 'Genre'},
+                    color_continuous_scale='viridis'
         )
              fig1.update_layout(
                     xaxis_title="Genre",
@@ -135,6 +134,78 @@ elif selection == "Etape 3":
                     margin=dict(l=50, r=50, t=50, b=150)
         )   
              st.plotly_chart(fig1, use_container_width=True)
+        with col2:
+             st.title('')
+             # Assurez-vous que la colonne 'genres' est bien en liste de dictionnaires
+             df['genres'] = df['genres'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+
+            # Étendre le DataFrame pour exploser les genres
+             all_genres = df.explode('genres')
+
+            # Extraire le nom du genre de chaque dictionnaire
+             all_genres['genre_name'] = all_genres['genres'].apply(lambda x: x['name'] if isinstance(x, dict) and 'name' in x else None)
+
+            # Supprimer les lignes sans genre valide
+             all_genres = all_genres.dropna(subset=['genre_name'])
+
+            # Grouper les votes par genre
+             votes_by_genre = all_genres.groupby('genre_name', as_index=False)['vote_count'].sum()
+
+            #   Grouper par genre et calculer la moyenne des notes (vote_average)
+             average_votes_by_genre = all_genres.groupby('genre_name', as_index=False)['vote_average'].mean()
+
+            # Créer un sous-graphe avec deux graphiques l'un en dessous de l'autre
+             fig2 = make_subplots(
+                rows=2, cols=1,  # Deux sous-graphes dans deux lignes
+                subplot_titles=('Nombre de Votes par Genre', 'Moyenne des Notes par Genre')
+            )
+
+            # Créer un graphique pour les votes avec la palette 'Viridis'
+             fig2.add_trace(
+                go.Bar(
+                    x=votes_by_genre['genre_name'],
+                    y=votes_by_genre['vote_count'],
+                    marker=dict(
+                        color=votes_by_genre['vote_count'],  # Appliquer la couleur en fonction du nombre de votes
+                        colorscale='Viridis',  # Palette de couleurs Viridis
+                        showscale=True  # Afficher l'échelle de couleurs
+                    ),
+                    name="Nombre de votes"
+                ),
+                row=1, col=1
+            )
+
+            # Créer un graphique pour la moyenne des notes avec la palette 'Viridis'
+             fig2.add_trace(
+                go.Bar(
+                    x=average_votes_by_genre['genre_name'],
+                    y=average_votes_by_genre['vote_average'],
+                    marker=dict(
+                        color=average_votes_by_genre['vote_average'],  # Appliquer la couleur en fonction de la moyenne des notes
+                        colorscale='Viridis',  # Palette de couleurs Viridis
+                        showscale=True  # Afficher l'échelle de couleurs
+                    ),
+                    name="Moyenne des notes"
+                ),
+                row=2, col=1
+            )
+
+            # Mettre à jour la disposition du graphique
+             fig2.update_layout(
+                title="Répartition des Films par Genre",
+                height=900,  # Augmenter la hauteur pour deux graphiques
+                width=1250,
+                showlegend=False,
+                xaxis_title="Genre",
+                yaxis_title="Nombre de votes",
+                xaxis2_title="Genre",
+                yaxis2_title="Moyenne des notes",
+                xaxis={'categoryorder': 'total descending'},  # Trier les genres par ordre décroissant de popularité
+                margin=dict(l=50, r=50, t=50, b=150),# Ajouter des marges pour une meilleure lisibilité
+            )
+
+            # Afficher le graphique
+             st.plotly_chart(fig2, use_container_width=True)
 
     with tab2:
         st.header("Années")
