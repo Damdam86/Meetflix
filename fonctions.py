@@ -3,12 +3,11 @@ import ast
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
-import requests
 import streamlit as st
 import random
 import df_tmdb_tool as dtt
 import requests
-#import folium
+import folium
 
 
 
