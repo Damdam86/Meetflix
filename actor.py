@@ -5,6 +5,7 @@ import requests
 from fonctions import get_actors_info, get_movie_with_id, get_person_with_id, get_movies_with_person_id, load_data, analyse_films_par_acteur
 from data_manager import person_dico
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 # Clé API pour TMDb
 api_key = st.secrets['API_KEY']
@@ -93,7 +94,6 @@ if actor_id is None:
 else:
     # Chargement des données des films
     df_movies_full = load_data()
-    df = load_data() # Chargement des films
     df_movies = get_movies_with_person_id(df_movies_full, actor_dico, actor_id).head(10)
 
     # Extract the year from the release_date column
@@ -105,6 +105,21 @@ else:
     # Récupérer les détails de l'acteur sélectionné
     actor_details = get_person_with_id(actor_dico, actor_id)    
 
+
+    #Statistique de l'acteur
+    fig, ax = plt.subplots(figsize=(5, 3))
+
+    fig2 = px.bar(df_movies, x=movies_per_year.index, y=movies_per_year.values)
+
+    ax.bar(movies_per_year.index, movies_per_year.values, color='indigo')
+    ax.set_title('Nombre de films par année', fontsize=12, color='white')
+    ax.set_xlabel('Année', fontsize=10, color='white')  
+    ax.set_ylabel('Nombre de films', fontsize=10, color='white')
+    ax.tick_params(axis='x', color='white')
+    ax.tick_params(axis='y', color='white')
+    ax.grid(axis='y', linestyle='--', alpha=0.7, color='white')
+
+   
     # Vérifier que les détails de l'acteur ont été correctement récupérés
     if actor_details is None:
         st.error("Impossible de récupérer les détails de l'acteur. Veuillez vérifier l'ID.")
@@ -122,20 +137,10 @@ else:
 
         with col3:
             st.markdown(f"**Biographie :** {actor_details.get('biography', 'Biographie non disponible')}")
+            # Afficher le graphique dans Streamlit
+            st.plotly_chart(fig2, use_container_width=True, transparent=True, theme=None)
 
 
-        #Statistique de l'acteur
-        fig, ax = plt.subplots(figsize=(12, 6))
-        ax.bar(movies_per_year.index, movies_per_year.values)
-        ax.set_title('Nombre de films par année', fontsize=16)
-        ax.set_xlabel('Année', fontsize=14)
-        ax.set_ylabel('Nombre de films', fontsize=14)
-        ax.tick_params(axis='x', rotation=45)
-        ax.grid(axis='y', linestyle='--', alpha=0.7)
-
-        # Afficher le graphique dans Streamlit
-        st.pyplot(fig)
-        
         # Affichage des films
         st.markdown("#### 🎥 Films de l'acteur :")
         if df_movies.empty:
