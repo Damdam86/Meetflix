@@ -103,9 +103,37 @@ elif selection == "Etape 2":
 #Etape 3
 elif selection == "Etape 3":
     st.title("Statistique TMDB")
-    tab1, tab2, tab3, tab4 = st.tabs(["Genres", "Années", "Durée", "Pays"])
-
+    tab1, tab2, tab3, tab4 = st.tabs(["Cinematic Overview", "Genres", "RunTime", "Cast & Crew"])
     with tab1:
+        df['release_year'] = pd.to_datetime(df['release_date'], errors='coerce').dt.year
+        yearly_movies = df['release_year'].value_counts().reset_index()
+        yearly_movies.columns = ['Année', 'Nombre de films']
+        yearly_movies = yearly_movies.sort_values('Année')
+
+        fig2 = px.line(yearly_movies, x='Année', y='Nombre de films', title="Évolution des sorties de films par année")
+        fig2.update_traces(line=dict(color='indigo'))
+        fig2.update_layout(xaxis_title="Année", yaxis_title="Nombre de films", height=600, margin=dict(l=50, r=50, t=50, b=50))
+        st.plotly_chart(fig2, use_container_width=True)
+
+        #st.subheader("Nombre de films par pays d'origine (Top 5 + Autres)")
+
+        df['origin_country'] = df['origin_country'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+        countries_expanded = df.explode('origin_country')
+        country_counts = countries_expanded['origin_country'].value_counts().reset_index()
+        country_counts.columns = ['country', 'count']
+
+        top_5_countries = country_counts.head(5)
+        autres_count = country_counts.iloc[5:]['count'].sum()
+        autres_row = pd.DataFrame({'country': ['Autres'], 'count': [autres_count]})
+        top_5_with_autres = pd.concat([top_5_countries, autres_row], ignore_index=True)
+
+        custom_colors = px.colors.sequential.Plasma[:4] + ["#FFD700"]
+        fig3 = px.pie(top_5_with_autres, values='count', names='country', title="Nombre de films par pays d'origine (Top 5 + Autres)", hole=0.4, color_discrete_sequence=custom_colors)
+        fig3.update_traces(textposition='inside', textinfo='percent+label')
+
+        st.plotly_chart(fig3, use_container_width=True)
+
+    with tab2:
         st.header("Genres")
         col1, col2 = st.columns(2)
         with col1:
@@ -206,16 +234,7 @@ elif selection == "Etape 3":
 
             # Afficher le graphique
              st.plotly_chart(fig2, use_container_width=True)
-
-    with tab2:
-        st.header("Années")
-        yearly_movies = df['release_date'].value_counts().reset_index()
-        yearly_movies.columns = ['Année', 'Nombre de films']
-
-        fig2 = px.line(yearly_movies.sort_values('Année'), x='Année', y='Nombre de films', title="Évolution des sorties de films par année")
-        fig2.update_traces(line=dict(color='indigo'))  
-        st.plotly_chart(fig2, use_container_width=True)
-       
+  
     with tab3:
         st.header("Durée")
         col1, col2 = st.columns(2)
@@ -272,40 +291,116 @@ elif selection == "Etape 3":
             fig5.update_xaxes(tickangle=45)
             st.plotly_chart(fig5, use_container_width=True)
 
-        with tab4:
-            st.header("Pays")
-            col1, col2 = st.columns(2)
-        with col1:          
-            df['origin_country'] = df['origin_country'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
-            countries_expanded = df.explode('origin_country')
+    with tab4:
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.header("Cast")          
+            def extract_names(column_data):
+                try:
+        # Essaie de convertir le texte en liste et de retourner les 5 premiers noms
+                    actors_list = ast.literal_eval(column_data) if column_data else []
+                    return [person['name'] for person in actors_list][:5]  # Limite aux 5 premiers noms
+                except Exception as e:
+                    print(f"Erreur lors de l'extraction des noms : {e}")
+                    return []
 
-# Compter le nombre de films par pays
-            country_counts = countries_expanded['origin_country'].value_counts().reset_index()
-            country_counts.columns = ['country', 'count']
+#Application de la fonction sur la colonne 'cast' pour extraire les acteurs
+            df['actors'] = df['cast'].apply(extract_names)
 
-            top_5_countries = country_counts.head(5)
-            autres_count = country_counts.iloc[5:]['count'].sum()
+#Exploser la colonne 'actors' pour avoir une ligne par acteur
+            data_actors = df.explode('actors')
 
-            autres_row = pd.DataFrame({
-                'country': ['Autres'],
-                'count': [autres_count]
-            })
-            top_5_with_autres = pd.concat([top_5_countries, autres_row], ignore_index=True)
+#Compter la fréquence d'apparition des acteurs
+            actor_counts = data_actors['actors'].value_counts()
 
-# Créer un graphique en anneau avec Plotly et la palette Plasma
-            custom_colors = px.colors.sequential.Plasma[:4] + ["#FFD700"]
-            fig6 = px.pie(
-                 top_5_with_autres,
-                values='count',
-                names='country',
-                title="Nombre de films par pays d'origine (Top 5 + Autres)",
-                hole=0.4,  
-                color_discrete_sequence= custom_colors
-        )   
-            fig6.update_traces(textposition='inside', textinfo='percent+label')
+            #Sélectionner les 50 acteurs les plus fréquents
+            top_50_actors = actor_counts.head(50).index.tolist()
 
-            st.plotly_chart(fig6, use_container_width=True)
-            
+            #Filtrer les données pour ne conserver que les films des top 50 acteurs
+            data_top_50_actors = data_actors[data_actors['actors'].isin(top_50_actors)]
+
+            #Extraire l'année de la colonne 'release_date'
+            data_top_50_actors['year'] = pd.to_datetime(data_top_50_actors['release_date']).dt.year
+
+            #Créer un DataFrame pour compter le nombre de films par acteur et par année
+            film_counts = data_top_50_actors.groupby(['actors', 'year']).size().reset_index(name='film_count')
+
+            #Créer un histogramme du nombre de films par acteur par année
+            fig1 = px.histogram(
+                film_counts,
+                x="year",  # L'année des films
+                y="film_count",  # Nombre de films
+                color="actors",  # Couleur par acteur
+                animation_frame="actors",  # Animation par acteur
+                title="Nombre de Films par Acteur par Année (Top 50)",
+                labels={"year": "Année", "film_count": "Nombre de Films", "actors": "Acteurs"},
+                nbins=20,  # Nombre de bins pour l'histogramme
+                hover_data=["actors", "year", "film_count"]
+)
+#Afficher le graphique
+            st.plotly_chart(fig1, use_container_width=True)
+
+        with col2: 
+            st.header(' Crew')   
+            director_votes = df.explode('cast')
+
+# Filtrer les lignes où 'cast' correspond à un directeur
+            director_votes = director_votes[director_votes['cast'].apply(
+                lambda x: isinstance(x, dict) and x.get('known_for_department') == 'Directing')]
+
+# Extraire le nom du directeur
+            director_votes['director_name'] = director_votes['cast'].apply(lambda x: x.get('name') if isinstance(x, dict) else None)
+
+# Supprimer les lignes sans nom de directeur valide
+            director_votes = director_votes.dropna(subset=['director_name'])
+
+# Grouper par nom du directeur et calculer les statistiques
+            director_stats = director_votes.groupby('director_name').agg({
+                'vote_average': 'mean',
+                'vote_count': 'sum',
+                'original_title': 'count'
+        }).reset_index()
+
+# Renommer les colonnes pour plus de clarté
+            director_stats.rename(columns={
+                'original_title': 'film_count',
+                'vote_average': 'average_rating',
+                'vote_count': 'total_votes'
+        }, inplace=True)
+
+# Trier par le nombre de films
+            director_stats = director_stats.sort_values(by='film_count', ascending=False)
+
+# Visualisation des résultats
+            import plotly.express as px
+
+# Histogramme pour le nombre de films par directeur
+            fig2 = px.bar(
+            director_stats.head(10),  # Afficher les 10 meilleurs
+            x='director_name',
+            y='film_count',
+            title="Top 10 des directeurs par nombre de films",
+            labels={'film_count': 'Nombre de films', 'director_name': 'Directeur'},
+            color='film_count',
+            color_continuous_scale='Plasma'
+    )
+            st.plotly_chart(fig2, use_container_width=True)
+
+# Diagramme pour la moyenne des votes par réalisateur
+            fig3 = px.scatter(
+            director_stats.head(10),
+            x='director_name',
+            y='average_rating',
+            size='total_votes',
+            title="Analyses de notes de top 10 directeurs(moyenne des notes vs total des votes)",
+            labels={'average_rating': 'Moyenne des notes', 'total_votes': 'Total des votes', 'director_name': 'Directeur'},
+            color='average_rating',
+            color_continuous_scale='Plasma'
+    )
+            st.plotly_chart(fig3, use_container_width=True)
+
+
 #Etape 4
 elif selection == "Etape 4":
     st.title("Le système de recommandation")
