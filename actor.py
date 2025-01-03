@@ -4,6 +4,7 @@ import ast
 import requests
 from fonctions import get_actors_info, get_movie_with_id, get_person_with_id, get_movies_with_person_id, load_data, analyse_films_par_acteur
 from data_manager import person_dico
+import matplotlib.pyplot as plt
 
 # Clé API pour TMDb
 api_key = st.secrets['API_KEY']
@@ -95,6 +96,12 @@ else:
     df = load_data() # Chargement des films
     df_movies = get_movies_with_person_id(df_movies_full, actor_dico, actor_id).head(10)
 
+    # Extract the year from the release_date column
+    df_movies['release_year'] = pd.to_datetime(df_movies['release_date'], errors='coerce').dt.year
+
+    # Count the number of movies per year
+    movies_per_year = df_movies['release_year'].value_counts().sort_index()
+
     # Récupérer les détails de l'acteur sélectionné
     actor_details = get_person_with_id(actor_dico, actor_id)    
 
@@ -118,7 +125,16 @@ else:
 
 
         #Statistique de l'acteur
-        
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.bar(movies_per_year.index, movies_per_year.values)
+        ax.set_title('Nombre de films par année', fontsize=16)
+        ax.set_xlabel('Année', fontsize=14)
+        ax.set_ylabel('Nombre de films', fontsize=14)
+        ax.tick_params(axis='x', rotation=45)
+        ax.grid(axis='y', linestyle='--', alpha=0.7)
+
+        # Afficher le graphique dans Streamlit
+        st.pyplot(fig)
         
         # Affichage des films
         st.markdown("#### 🎥 Films de l'acteur :")
