@@ -117,9 +117,9 @@ else:
             st.markdown(f"**Biographie :** {actor_details.get('biography', 'Biographie non disponible')}")
 
 
-        #statistique
-        analyse_films_par_acteur(selected_actor_name)
-
+        #Statistique de l'acteur
+        
+        
         # Affichage des films
         st.markdown("#### 🎥 Films de l'acteur :")
         if df_movies.empty:
