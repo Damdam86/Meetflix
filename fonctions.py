@@ -3,11 +3,12 @@ import ast
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
+import requests
 import streamlit as st
 import random
 import df_tmdb_tool as dtt
 import requests
-import folium
+#import folium
 
 
 
@@ -16,6 +17,7 @@ tmdb_file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'
 keywords_dummies_file_path='https://sevlacgames.com/tmdb/keywords_dummies.csv'
 genres_dummies_file_path='https://sevlacgames.com/tmdb/genres_dummies.csv'
 cast_dummies_file_path='https://sevlacgames.com/tmdb/cast_dummies.csv'
+X_extended_file_path='https://sevlacgames.com/tmdb/X_extended.csv'
 
 # On load les datas (recoltées par l'API TMDB)
 @st.cache_data
@@ -35,7 +37,7 @@ def clean_keywords(keywords, stop_words):
 def load_and_prepare_data():
     # Chargement du dataset et convertion des colonne ['genres'] et ['cast'] en dictionnaires, ['origin_country'] en list
     data = load_data()
-
+    X_extended = pd.read_csv(X_extended)
     # Créer une nouvelle colonne contenant uniquement les noms des genres
     #data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
     # Créer une nouvelle colonne contenant uniquement les noms des 5 acteurs principaux
@@ -43,18 +45,18 @@ def load_and_prepare_data():
 
     # Utiliser `get_dummies` pour créer des colonnes de mots clés
     #keywords_dummies = data['keywords'].str.get_dummies()
-    keywords_dummies = pd.read_csv(keywords_dummies_file_path)
+    #keywords_dummies = pd.read_csv(keywords_dummies_file_path)
     # Utiliser `get_dummies` pour créer des colonnes de genres
     #genres_dummies = data['genre_names'].str.join('|').str.get_dummies()
-    genres_dummies = pd.read_csv(genres_dummies_file_path)
+    #genres_dummies = pd.read_csv(genres_dummies_file_path)
     # Utiliser `get_dummies` pour créer des colonnes de cast
     #cast_dummies = data['cast_names'].str.join('|').str.get_dummies()
-    cast_dummies = pd.read_csv(cast_dummies_file_path)
+    #cast_dummies = pd.read_csv(cast_dummies_file_path)
     
     # Sélectionner les colonnes numériques
-    numerical_features = data[['popularity', 'vote_average']]
+    #numerical_features = data[['popularity']]
 
-    return data, numerical_features, genres_dummies, cast_dummies, keywords_dummies
+    return data, X_extended
 
 def user_define_weights():
         with st.expander("Ajustez les poids des variables", expanded=False):
@@ -69,9 +71,9 @@ def user_define_weights():
 
 # Préparation du pipeline KNN
 @st.cache_data
-def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, keywords_dummies, weights=None):
+def create_and_train_pipeline(X_extended):
     # Définir les poids par défaut pour chaque variable
-    if weights is None:
+    '''if weights is None:
         weights = {
             #'vote_average': 1,  # Plus important
             #'vote_count': 1,    # Moins important
@@ -107,7 +109,7 @@ def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, 
 
     # Concaténation de l'ensemble des données (numerique + genre)
     X_extended = pd.concat([numerical_features_scaled_df, genres_weighted, cast_dummies, keywords_dummies], axis=1)
-    print(X_extended)
+    print(X_extended)'''
 
     # Préparation du pipeline pour le modèle KNN
     pipeline = Pipeline([
@@ -117,11 +119,11 @@ def create_and_train_pipeline(numerical_features, genres_dummies, cast_dummies, 
     # Entraînement du modèle KNN
     pipeline.fit(X_extended)
 
-    return pipeline, X_extended, scaler
+    return pipeline
 
 
 # Fonction de recommandation
-def recommend_movies(movie_id, data, X_extended, pipeline, numerical_features, genres_dummies, cast_dummies, keywords_dummies):
+def recommend_movies(movie_id, data, X_extended, pipeline):
     # Vérifier si l'ID du film existe dans les données
     if not data['id'].isin([movie_id]).any():
         return []
