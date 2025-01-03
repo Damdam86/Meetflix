@@ -37,7 +37,7 @@ def clean_keywords(keywords, stop_words):
 def load_and_prepare_data():
     # Chargement du dataset et convertion des colonne ['genres'] et ['cast'] en dictionnaires, ['origin_country'] en list
     data = load_data()
-    X_extended = pd.read_csv(X_extended)
+    X_extended = pd.read_csv(X_extended_file_path)
     # Créer une nouvelle colonne contenant uniquement les noms des genres
     #data['genre_names'] = data['genres'].apply(lambda genres: [genre['name'] for genre in genres] if genres else [])
     # Créer une nouvelle colonne contenant uniquement les noms des 5 acteurs principaux
