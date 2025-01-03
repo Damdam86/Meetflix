@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import ast
 import requests
-from fonctions import get_actors_info, get_movie_with_id, get_person_with_id, get_movies_with_person_id, load_data
+from fonctions import get_actors_info, get_movie_with_id, get_person_with_id, get_movies_with_person_id, load_data, analyse_films_par_acteur
 from data_manager import person_dico
 
 # Clé API pour TMDb
@@ -118,66 +118,6 @@ else:
 
 
         #statistique
-        # Fonction pour extraire les noms des acteurs principaux
-        def extract_actors(cast_list, top_n=2):
-            try:
-                cast = ast.literal_eval(cast_list)  # Convertir en liste de dictionnaires
-                return ', '.join([person['name'] for person in cast[:top_n]])  # Prendre les top_n premiers acteurs
-            except:
-                return None
-
-        # Extraire les acteurs principaux
-        df['main_actors'] = df['cast'].apply(lambda x: extract_actors(x, top_n=2))
-
-        def analyse_films_par_acteur(acteur_nom):
-            # Filtrer les films de l'acteur
-            films_acteur = df[df['main_actors'].str.contains(acteur_nom, na=False)]
-
-            # Vérifier si des films ont été trouvés
-            if films_acteur.empty:
-                st.warning(f"Aucun film trouvé pour l'acteur : {acteur_nom}")
-                return
-
-            # 1. Nombre de films par année
-            films_acteur['release_year'] = pd.to_datetime(films_acteur['release_date'], errors='coerce').dt.year
-            fig2 = px.histogram(
-                films_acteur, 
-                x='release_year', 
-                nbins=20, 
-                title=f"Nombre de films par année avec {acteur_nom}",
-                color_discrete_sequence=['indigo']
-            )
-            fig2.update_layout(
-                xaxis_title="Année de sortie",
-                yaxis_title="Nombre de films",
-                height=600,
-                width=1250,
-                margin=dict(l=50, r=50, t=50, b=100)
-            )
-
-            # 2. Top films par note moyenne (limité aux films ayant plus de 5 votes)
-            films_acteur_avec_votes = films_acteur[films_acteur['vote_count'] >= 5]
-            top_films_note = films_acteur_avec_votes.sort_values(by='vote_average', ascending=False).head(10)
-            fig3 = px.bar(
-                top_films_note, 
-                x='title', 
-                y='vote_average', 
-                title=f"Top 10 des films les mieux notés avec {acteur_nom}",
-                color='vote_average', 
-                color_continuous_scale='viridis'
-            )
-            fig3.update_layout(
-                xaxis_tickangle=-45,
-                xaxis_title="Titre des films",
-                yaxis_title="Note moyenne",
-                height=600,
-                width=1250,
-                margin=dict(l=50, r=50, t=50, b=150)
-            )
-
-            st.plotly_chart(fig2, use_container_width=True)
-            st.plotly_chart(fig3, use_container_width=True)
-
         analyse_films_par_acteur(selected_actor_name)
 
         # Affichage des films
