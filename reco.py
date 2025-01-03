@@ -166,46 +166,28 @@ for i, movie in enumerate(random_movies):
 
 st.markdown("# Testez nos recommandations")
 
-# Distribution et nbre de colonnes
-col1, col2, col3 = st.columns([3, 1, 3])
+
+st.subheader("Basé sur un film")
+st.write("Indiquez un film et nous vous recommanderons des titres similaires.")
+# Utilisation du selectbox pour choisir un film
+titres = data['title'].tolist()
+selected_movie_title = st.selectbox("Choisissez un film :", titres)
+# Récupérer l'ID du film sélectionné
+selected_movie_id = data[data['title'] == selected_movie_title]['id'].values[0]
+
+weights = user_define_weights()
 
 
-# Mode 1 : Film similaire
-with col1:
-    st.subheader("Basé sur un film")
-    st.write("Indiquez un film et nous vous recommanderons des titres similaires.")
-    # Utilisation du selectbox pour choisir un film
-    titres = data['title'].tolist()
-    selected_movie_title = st.selectbox("Choisissez un film :", titres)
-    # Récupérer l'ID du film sélectionné
-    selected_movie_id = data[data['title'] == selected_movie_title]['id'].values[0]
-
-    weights = user_define_weights()
-
-
-    if selected_movie_id is not None:
-        st.markdown(
-            f"""
-            <a href="/movie?movie_id={selected_movie_id}" target="_self">
-                <button style="background-color: #317AC1; color: white; border-radius: 10px; padding: 10px; cursor: pointer;">
-                    Recommander des films similaires
-                </button>
-            </a>
-            """,
-            unsafe_allow_html=True
-        )
-
-with col2:  # Colonne de séparation
-    st.text("")
-
-# Mode 2 : Réponse questionnaire
-with col3:
-    st.subheader("Basé sur vos réponses")
-    st.write("3 questions simples et obtenez des recommandations personnalisées.")
-    st.button("Commencer", key="start_questionnaire")
-    genre = st.radio(
-        "Préférez-vous un film récent ?",
-        ["Oui", "Non", "Peu importe"]
+if selected_movie_id is not None:
+    st.markdown(
+        f"""
+        <a href="/movie?movie_id={selected_movie_id}" target="_self">
+            <button style="background-color: #317AC1; color: white; border-radius: 10px; padding: 10px; cursor: pointer;">
+                Recommander des films similaires
+            </button>
+        </a>
+        """,
+        unsafe_allow_html=True
     )
 
 ################################################################################

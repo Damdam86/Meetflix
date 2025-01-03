@@ -109,7 +109,13 @@ with col2:  # Informations principales
     <button class='play-button'>▶ Voir le film</button>
     <br><br><button class='info-button'>+ Ajouter aux favoris</button>
     """, unsafe_allow_html=True)
-    st.markdown(f"**A voir sur :** ")
+    st.markdown("#### 🎥 Bande-Annonce")
+    youtube_key = data.loc[data['id'] == selected_movie_id, 'video'].values[0]
+    if youtube_key:  # Vérifier que la clé est disponible
+        youtube_url = f"https://www.youtube.com/watch?v={youtube_key}"
+        st.video(youtube_url)
+    else:
+        st.markdown("**Bande-annonce non disponible**")
 
 
 with col3:  # Résumé et détails techniques
@@ -165,18 +171,3 @@ for i, voisin in enumerate(voisins_top_10):
             </div>
         
         """, unsafe_allow_html=True)
-        
-# Bande-annonce et avis
-col1, col2, col3 = st.columns([1, 1, 3])
-
-with col1:
-    st.markdown("#### 🎥 Bande-Annonce")
-    st.video(f'https://api.themoviedb.org/3/movie/{voisin['id']}/videos')
-    st.markdown('**Bande-annonce non disponible**')
-
-with col3:
-    st.markdown("#### 💬 Critique")
-    st.markdown('**Aucun avis disponible**')
-
-
-st.markdown("</div>", unsafe_allow_html=True)
