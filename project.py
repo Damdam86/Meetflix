@@ -91,29 +91,46 @@ df_retroplanning = pd.DataFrame(retroplanning)
 
 st.write(df_retroplanning)
 
+st.header("🛠️ Les outils et techno pour ce projet")
 
-# Rétroplanning 
-st.divider()
-st.header("🛠️ Les outils utilisés")
-st.write("Les outils utilisés pour ce projet")
+col1, col2 = st.columns(2)
 
-retroplanning = {
-    "Étape": ["Réaliser une étude de marché sur la consommation de cinéma dans la Creuse", 
-              "Réaliser une étude de marché sur la consommation de cinéma dans la Creuse", 
-              "Appropriation, exploration des données et nettoyage (Pandas, Matplotlib, Seaborn)", 
-              "Début création maquette sous streamlit", 
-              "Machine learning et recommandations (scikit-learn)",
-              "Amélioration maquette streamlit, test algo de recommandation et création des statistiques",
-              "Affinage et amélioration fluidité / rapidité du site, modification des fonctions, affinage de l'interface et prépration de la présentation"],
-    "Timing": ["Semaine 1", 
-               "Semaine 2", 
-               "Semaine 3", 
-               "Semaine 4",
-               "Semaine 5",
-               "Semaine 6",
-               "Semaine 7"],
-    "Statut": ["✅", "✅", "✅", "✅", "✅", "✅", "✅"]
-}
-df_retroplanning = pd.DataFrame(retroplanning)
+with col1 :
+    st.markdown("### **💻 Langages :**")
+    st.markdown("- 🐍 **Python** : pour le développement global du projet.")
+    st.markdown("- 🌐 **HTML** et 🎨 **HTML** : pour la mise en page, le design et les effets sur les pages, textes et images. ")
 
-st.write(df_retroplanning)
+    st.markdown("### **📊 Librairies de manipulation des données :**")
+    st.markdown("""
+    - 🐼 **Pandas** : analyse et transformation des données.
+    - 🔢 **NumPy** : opérations mathématiques et manipulation efficace des tableaux.
+    """)
+
+    st.markdown("### **🤖 Librairies pour la recommandation et le machine learning :**")
+    st.markdown("""
+    - 🧠 **Scikit-learn** : calcul de similarité, algorithmes de recommandation et outils d'apprentissage automatique.
+    - 🎲 **Surprise** (optionnel) : pour le filtrage collaboratif.
+    """)
+
+    st.markdown("### **📈 Bibliothèques pour la visualisation des données :**")
+    st.markdown("""
+    - 📊 **Matplotlib** et 🎨 **Seaborn** : visualisation de données pour comprendre les tendances et les distributions.
+    """)
+
+with col2 :
+   
+    st.markdown("### **🧹 Gestion et nettoyage des données :**")
+    st.markdown("""
+    - 🧾 **Expressions régulières (re)** : pour le nettoyage et la manipulation textuelle.""")
+
+    st.markdown("### **🌐 APIs utilisées :**")
+    st.markdown("""
+    - 🎬 **API TMDB (The Movie Database)** : pour la création de la base de données, les images des films, des acteurs etc. (titres, genres, notes, acteurs, etc.).
+    - 🤖 **API OpenAI** : pour la génération de mots-clés à partir des synopsys.
+    """)
+
+    st.markdown("### **🖥️ Développement de l'interface utilisateur :**")
+    st.markdown("- 🌟 **Streamlit** : création rapide et interactive d'applications web pour afficher les résultats et interagir avec les utilisateurs.")
+
+    st.markdown("### **🌍 Collaborations et versioning :**")
+    st.markdown("- 🛠️ **GitHub** et **GitHub Desktop** : pour le contrôle de version et la collaboration.")

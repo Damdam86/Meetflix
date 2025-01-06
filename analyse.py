@@ -58,7 +58,7 @@ selection = sac.steps(
         sac.StepsItem(title='Etape 2', description="Etude, filtrage, fusion des données IMDB"),
         sac.StepsItem(title='Etape 3', description="Etude API TMDB, création de la nouvelle base"),
         sac.StepsItem(title='Etape 4', description="Statistique TMDB"),
-        sac.StepsItem(title='Etape 5', description="Algorythmes de recommandation"),
+        sac.StepsItem(title='Etape 5', description="Algorithmes de recommandation - machine learning"),
         sac.StepsItem(title='Etape 6', description="La base de données finale"),
     ], 
 )
@@ -538,37 +538,28 @@ elif selection == "Etape 4":
 #Etape 5
 elif selection == "Etape 5":
     st.title("Le système de recommandation")
-    st.text("Nous avons fait le choix de partir sur plusieurs solutions de recommandation.")
     
     col1, col2 = st.columns(2)
     with col1:
         st.title("KNN")
-        st.text("Nous avons fait le choix de partir sur plusieurs solutions de recommandation.")
-        # Détails du système de recommandation avec conteneur de fond et icônes
-        st.divider()
-        st.header("🔧 Détails du Système de Recommandation")
-        st.write("Le tableau ci-dessous présente les principales caractéristiques de notre système de recommandation.")
+        st.write("""
+        Notre approche KNN s'appuie sur des données diverses pour trouver les films les plus similaires selon plusieurs critères :  
+        - **Données numériques TMDB utilisées** : Utilisation de la popularité des films avec application d'un scaler `StandardScaler`.
+        - **Données non numériques TMDB utilisées** : Conversion de tous les genres + les acteurs principaux (5 premiers) en variables numériques via `get_dummies`.  
+        - **Données non numériques autres utilisées** : Ajout des 3 mots-clés par film créer à partir de l'API OpenAI. Ses mots clés sont ensuites convertis en variable numérique avec `get_dummies`. 
+        - **Distance :** Choix de la distance de Minkowski avec un paramètre de `k=26`.  
+        """)
 
-        system_features = {
-            "Caractéristique": [
-                "🎯 Personnalisation",
-                "🌐 Utilisation de données externes",
-                "👥 Filtrage collaboratif",
-                "📑 Filtrage basé sur le contenu"
-            ],
-            "Description": [
-                "Recommandations personnalisées basées sur les préférences des utilisateurs",
-                "Utilisation de données externes pour pallier l'absence de données internes",
-                "Suggestions basées sur les préférences d'autres utilisateurs",
-                "Recommandations basées sur les caractéristiques des films"
-            ],
-            "Statut": ["🛠️", "✅", "🛠️", "📅"]
-        }
-        df_system_features = pd.DataFrame(system_features)
-        st.write(df_system_features)
     with col2:
-        st.title("BERT")
-        st.text("Nous avons fait le choix de partir sur plusieurs solutions de recommandation.")
+        st.title("Génération de mots-clés")
+        st.text("Exploitation de l'API OpenAI pour enrichir les données de contenu.")
+        st.write(
+            """
+            - **Principe :** Analyse des synopsis de plus de 4000 films pour générer des mots-clés représentatifs.  
+            - **Utilisation :** Ces mots-clés sont utilisés pour améliorer la précision des recommandations basées sur le contenu.
+            - **Prompt utilisé :** f"Basé sur le synopsis suivant du film '{movie_title}', donne-moi 3 mots-clés pertinents :{movie_overview}. Utilise des mots-clés simples (1 mot) qui résument bien le film. L'objectif est d'avoir des mots-clés pertinents afin de pouvoir entraîner un modèle de machine learning et ainsi faire des suggestions de films."
+            """
+        )
 
 #Etape 6
 elif selection == "Etape 6":
