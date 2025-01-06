@@ -472,8 +472,8 @@ elif selection == "Etape 4":
         col1, col2 = st.columns(2)
         with col1:
             st.header("Cast")          
-           
-            st.image(r"C:\Users\guilbaud-f\Desktop\TOP10_acteursplus présents.png")
+            st.subheader('Top 10 des acteurs les mieux notés avec au moins 10 films')
+            st.image(r"C:\Users\guilbaud-f\Documents\GitHub\Meetflix\images\TOP10_acteurs.png")
 
         with col2: 
             st.header(' Crew')   
