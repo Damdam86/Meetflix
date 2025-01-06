@@ -17,10 +17,6 @@ import json
 st.markdown(
     """
         <style>
-            p {
-                font-size: 25px;
-            }
-
             .center-image {
                 display: flex;
                 justify-content: center;
