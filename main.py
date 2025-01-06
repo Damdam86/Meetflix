@@ -17,6 +17,7 @@ pages = [
     st.Page("search_movies.py", title="Rechercher", icon="🎬"),
     st.Page("movie.py", title="Les films", icon="🎬"),
     st.Page("actor.py", title="Les acteurs", icon="🎭"),
+    st.Page("conclusion.py", title="Conclusion", icon="🏁"),
 ]
 
 # Activer la navigation
