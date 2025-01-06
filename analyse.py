@@ -472,49 +472,96 @@ elif selection == "Etape 4":
         col1, col2 = st.columns(2)
         with col1:
             st.header("Cast")          
-           
-            st.image(r"C:\Users\guilbaud-f\Desktop\TOP10_acteursplus présents.png")
+            #st.subheader('Top 10 des acteurs les mieux notés avec au moins 10 films')
+            #st.markdown("<p style='font-size:10px;'>Top 10 des acteurs les mieux notés avec au moins 10 films</p>", unsafe_allow_html=True)
+            #st.image(r"C:\Users\guilbaud-f\Documents\GitHub\Meetflix\images\TOP10_acteurs.png")
+            from collections import Counter
+            def extract_actors(cast_list, top_n=2):
+                try:
+                    # Convertir la chaîne de caractères en liste de dictionnaires
+                    cast = ast.literal_eval(cast_list) if isinstance(cast_list, str) else []
+                    # Extraire les noms des acteurs (top_n premiers)
+                    return ', '.join([person['name'] for person in cast[:top_n]])
+                except (ValueError, TypeError):
+                    # Gérer les erreurs (par exemple : cast_list n'est pas une liste valide)
+                    return None
+                # Appliquer la fonction pour extraire les acteurs principaux
+            df['main_actors'] = df['cast'].apply(lambda x: extract_actors(x, top_n=2))
+
+            # Afficher un aperçu des données
+            #st.write("Aperçu des films et acteurs principaux :")
+            #st.dataframe(df[['title', 'main_actors']])
+
+            # Créer une liste de tous les acteurs principaux
+            all_actors = df['main_actors'].dropna().str.split(', ').explode()
+            all_actors = all_actors.str.strip()
+
+            # Compter les occurrences des acteurs
+            actor_counts = Counter(all_actors)
+
+            # Créer un DataFrame pour visualiser
+            actors_df = pd.DataFrame(actor_counts.items(), columns=['Actor', 'Count']).sort_values(by='Count', ascending=False)
+
+            # Visualisation avec Plotly
+            fig = px.bar(
+                actors_df.head(10),  # Top 10 acteurs
+                x='Actor',
+                y='Count',
+                title="Top 10 des acteurs principaux les plus présents",
+                color='Count',
+                color_continuous_scale='plasma'
+            )
+
+            # Mise à jour du design du graphique
+            fig.update_layout(
+                xaxis_title="Acteurs",
+                yaxis_title="Nombre d'apparitions",
+                xaxis_tickangle=-45,
+                height=600,
+                width=800,
+                margin=dict(l=50, r=50, t=50, b=150)
+            )
+
+            # Afficher le graphique dans Streamlit
+            st.plotly_chart(fig)
 
         with col2: 
             st.header(' Crew')   
             director_votes = df.explode('cast')
-
-# Filtrer les lignes où 'cast' correspond à un directeur
             director_votes = director_votes[director_votes['cast'].apply(
                 lambda x: isinstance(x, dict) and x.get('known_for_department') == 'Directing')]
 
-# Extraire le nom du directeur
             director_votes['director_name'] = director_votes['cast'].apply(lambda x: x.get('name') if isinstance(x, dict) else None)
 
-# Supprimer les lignes sans nom de directeur valide
+
             director_votes = director_votes.dropna(subset=['director_name'])
 
-# Grouper par nom du directeur et calculer les statistiques
+
             director_stats = director_votes.groupby('director_name').agg({
                 'vote_average': 'mean',
                 'vote_count': 'sum',
                 'original_title': 'count'
         }).reset_index()
 
-# Renommer les colonnes pour plus de clarté
+
             director_stats.rename(columns={
                 'original_title': 'film_count',
                 'vote_average': 'average_rating',
                 'vote_count': 'total_votes'
         }, inplace=True)
 
-# Trier par le nombre de films
+
             director_stats = director_stats.sort_values(by='film_count', ascending=False)
 
-# Visualisation des résultats
+
             import plotly.express as px
 
-# Histogramme pour le nombre de films par directeur
+
             fig2 = px.bar(
             director_stats.head(10),  # Afficher les 10 meilleurs
             x='director_name',
             y='film_count',
-            title="Top 10 des directeurs par nombre de films",
+            title="Top 10 des directeurs par nombre de films", 
             labels={'film_count': 'Nombre de films', 'director_name': 'Directeur'},
             color='film_count',
             color_continuous_scale='Plasma'
