@@ -301,7 +301,6 @@ elif selection == "Etape 4":
         # Calculer la matrice de corrélation des colonnes numériques restantes
         corr_matrix = df_cleaned.corr()
 
-        # Créer le heatmap avec le thème "viridis"
         fig4 = plt.figure(figsize=(4, 4))
         sns.heatmap(corr_matrix, annot=True, cmap='plasma', fmt='.2f', vmin=-1, vmax=1, linewidths=0.5)
 
@@ -473,50 +472,8 @@ elif selection == "Etape 4":
         col1, col2 = st.columns(2)
         with col1:
             st.header("Cast")          
-            def extract_names(column_data):
-                try:
-        # Essaie de convertir le texte en liste et de retourner les 5 premiers noms
-                    actors_list = ast.literal_eval(column_data) if column_data else []
-                    return [person['name'] for person in actors_list][:5]  # Limite aux 5 premiers noms
-                except Exception as e:
-                    print(f"Erreur lors de l'extraction des noms : {e}")
-                    return []
-
-#Application de la fonction sur la colonne 'cast' pour extraire les acteurs
-            df['actors'] = df['cast'].apply(extract_names)
-
-#Exploser la colonne 'actors' pour avoir une ligne par acteur
-            data_actors = df.explode('actors')
-
-#Compter la fréquence d'apparition des acteurs
-            actor_counts = data_actors['actors'].value_counts()
-
-            #Sélectionner les 50 acteurs les plus fréquents
-            top_50_actors = actor_counts.head(50).index.tolist()
-
-            #Filtrer les données pour ne conserver que les films des top 50 acteurs
-            data_top_50_actors = data_actors[data_actors['actors'].isin(top_50_actors)]
-
-            #Extraire l'année de la colonne 'release_date'
-            data_top_50_actors['year'] = pd.to_datetime(data_top_50_actors['release_date']).dt.year
-
-            #Créer un DataFrame pour compter le nombre de films par acteur et par année
-            film_counts = data_top_50_actors.groupby(['actors', 'year']).size().reset_index(name='film_count')
-
-            #Créer un histogramme du nombre de films par acteur par année
-            fig1 = px.histogram(
-                film_counts,
-                x="year",  # L'année des films
-                y="film_count",  # Nombre de films
-                color="actors",  # Couleur par acteur
-                animation_frame="actors",  # Animation par acteur
-                title="Nombre de Films par Acteur par Année (Top 50)",
-                labels={"year": "Année", "film_count": "Nombre de Films", "actors": "Acteurs"},
-                nbins=20,  # Nombre de bins pour l'histogramme
-                hover_data=["actors", "year", "film_count"]
-)
-#Afficher le graphique
-            st.plotly_chart(fig1, use_container_width=True)
+           
+            st.image(r"C:\Users\guilbaud-f\Desktop\TOP10_acteursplus présents.png")
 
         with col2: 
             st.header(' Crew')   
