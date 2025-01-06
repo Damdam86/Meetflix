@@ -63,7 +63,7 @@ components.html(
     height=400  # Ajustez la hauteur selon vos besoins
 )
 progress_text = "Avancement du projet"
-my_bar = st.progress(0.4, text=progress_text)  
+my_bar = st.progress(0.98, text=progress_text)  
 
 # Rétroplanning 
 st.divider()
@@ -74,10 +74,10 @@ retroplanning = {
     "Étape": ["Réaliser une étude de marché sur la consommation de cinéma dans la Creuse", 
               "Réaliser une étude de marché sur la consommation de cinéma dans la Creuse", 
               "Appropriation, exploration des données et nettoyage (Pandas, Matplotlib, Seaborn)", 
-              "Appropriation, exploration des données et nettoyage (Pandas, Matplotlib, Seaborn)", 
+              "Début création maquette sous streamlit", 
               "Machine learning et recommandations (scikit-learn)",
-              "Machine learning et recommandations (scikit-learn)",
-              "Affinage, interface et présentation"],
+              "Amélioration maquette streamlit, test algo de recommandation et création des statistiques",
+              "Affinage et amélioration fluidité / rapidité du site, modification des fonctions, affinage de l'interface et prépration de la présentation"],
     "Timing": ["Semaine 1", 
                "Semaine 2", 
                "Semaine 3", 
@@ -85,7 +85,7 @@ retroplanning = {
                "Semaine 5",
                "Semaine 6",
                "Semaine 7"],
-    "Statut": ["✅", "✅", "✅", "✅", "🛠️", "🛠️", "📅"]
+    "Statut": ["✅", "✅", "✅", "✅", "✅", "✅", "✅"]
 }
 df_retroplanning = pd.DataFrame(retroplanning)
 
