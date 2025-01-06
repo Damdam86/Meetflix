@@ -90,3 +90,30 @@ retroplanning = {
 df_retroplanning = pd.DataFrame(retroplanning)
 
 st.write(df_retroplanning)
+
+
+# Rétroplanning 
+st.divider()
+st.header("🛠️ Les outils utilisés")
+st.write("Les outils utilisés pour ce projet")
+
+retroplanning = {
+    "Étape": ["Réaliser une étude de marché sur la consommation de cinéma dans la Creuse", 
+              "Réaliser une étude de marché sur la consommation de cinéma dans la Creuse", 
+              "Appropriation, exploration des données et nettoyage (Pandas, Matplotlib, Seaborn)", 
+              "Début création maquette sous streamlit", 
+              "Machine learning et recommandations (scikit-learn)",
+              "Amélioration maquette streamlit, test algo de recommandation et création des statistiques",
+              "Affinage et amélioration fluidité / rapidité du site, modification des fonctions, affinage de l'interface et prépration de la présentation"],
+    "Timing": ["Semaine 1", 
+               "Semaine 2", 
+               "Semaine 3", 
+               "Semaine 4",
+               "Semaine 5",
+               "Semaine 6",
+               "Semaine 7"],
+    "Statut": ["✅", "✅", "✅", "✅", "✅", "✅", "✅"]
+}
+df_retroplanning = pd.DataFrame(retroplanning)
+
+st.write(df_retroplanning)
