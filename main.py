@@ -14,9 +14,9 @@ pages = [
     st.Page("analyse.py", title="Analyse", icon="📊"),
     st.Page("intro.py", title="intro", icon="🎭"),
     st.Page("reco.py", title="Recommandation", icon="🏠"),
-    st.Page("search_movies.py", title="Full movies", icon="🎬"),
-    st.Page("movie.py", title="Best movies", icon="🎬"),
-    st.Page("actor.py", title="Acteurs", icon="🎭"),
+    st.Page("search_movies.py", title="Rechercher", icon="🎬"),
+    st.Page("movie.py", title="Les films", icon="🎬"),
+    st.Page("actor.py", title="Les acteurs", icon="🎭"),
 ]
 
 # Activer la navigation

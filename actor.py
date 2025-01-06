@@ -94,7 +94,7 @@ if actor_id is None:
 else:
     # Chargement des données des films
     df_movies_full = load_data()
-    df_movies = get_movies_with_person_id(df_movies_full, actor_dico, actor_id).head(10)
+    df_movies = get_movies_with_person_id(df_movies_full, actor_dico, actor_id)
 
     # Extract the year from the release_date column
     df_movies['release_year'] = pd.to_datetime(df_movies['release_date'], errors='coerce').dt.year
@@ -111,15 +111,6 @@ else:
 
     fig2 = px.bar(df_movies, x=movies_per_year.index, y=movies_per_year.values)
 
-    ax.bar(movies_per_year.index, movies_per_year.values, color='indigo')
-    ax.set_title('Nombre de films par année', fontsize=12, color='white')
-    ax.set_xlabel('Année', fontsize=10, color='white')  
-    ax.set_ylabel('Nombre de films', fontsize=10, color='white')
-    ax.tick_params(axis='x', color='white')
-    ax.tick_params(axis='y', color='white')
-    ax.grid(axis='y', linestyle='--', alpha=0.7, color='white')
-
-   
     # Vérifier que les détails de l'acteur ont été correctement récupérés
     if actor_details is None:
         st.error("Impossible de récupérer les détails de l'acteur. Veuillez vérifier l'ID.")
@@ -147,7 +138,7 @@ else:
             st.info("Aucun film trouvé pour cet acteur.")
         else:
             movie_cols = st.columns(5)
-            for i, (_, movie) in enumerate(df_movies.iterrows()):
+            for i, (_, movie) in enumerate(df_movies.head(10).iterrows()):
                 with movie_cols[i % 5]:
                     poster_url = f"https://image.tmdb.org/t/p/original/{movie.get('poster_path', '')}"
                     movie_title = movie.get("title", "Titre inconnu")
