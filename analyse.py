@@ -302,7 +302,7 @@ elif selection == "Etape 4":
         corr_matrix = df_cleaned.corr()
 
         # Créer le heatmap avec le thème "viridis"
-        fig4 = plt.figure(figsize=(10, 8))
+        fig4 = plt.figure(figsize=(4, 4))
         sns.heatmap(corr_matrix, annot=True, cmap='plasma', fmt='.2f', vmin=-1, vmax=1, linewidths=0.5)
 
         # Ajouter un titre
