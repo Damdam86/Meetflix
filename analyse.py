@@ -296,6 +296,24 @@ elif selection == "Etape 4":
 
         st.plotly_chart(fig3, use_container_width=True)
 
+        # Afficher le heatmap
+        df_cleaned = df.select_dtypes(include=['float64', 'int64'])
+
+        # Si tu souhaites aussi exclure certaines colonnes spécifiques (comme 'id' ou d'autres colonnes inutiles)
+        df_cleaned = df_cleaned.drop(columns=['id'], errors='ignore')  # Ajoute d'autres colonnes à exclure si nécessaire
+
+        # Calculer la matrice de corrélation des colonnes numériques restantes
+        corr_matrix = df_cleaned.corr()
+
+        # Créer le heatmap avec le thème "viridis"
+        fig4 = plt.figure(figsize=(10, 8))
+        sns.heatmap(corr_matrix, annot=True, cmap='plasma', fmt='.2f', vmin=-1, vmax=1, linewidths=0.5)
+
+        # Ajouter un titre
+        plt.title('Heatmap de Corrélation')
+
+        st.pyplot(fig4)
+
     with tab2:
         st.header("Genres")
         col1, col2 = st.columns(2)
