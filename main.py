@@ -12,12 +12,12 @@ pages = [
     st.Page("project.py", title="Le projet", icon="🔥"),
     st.Page("team.py", title="L'équipe", icon="🤹‍♀️"),
     st.Page("analyse.py", title="Analyse", icon="📊"),
+    st.Page("conclusion.py", title="Conclusion", icon="🏁"),
     st.Page("intro.py", title="Intro", icon="🎭"),
     st.Page("reco.py", title="Recommandation", icon="🏠"),
     st.Page("search_movies.py", title="Rechercher", icon="🎬"),
     st.Page("movie.py", title="Les films", icon="🎬"),
     st.Page("actor.py", title="Les acteurs", icon="🎭"),
-    st.Page("conclusion.py", title="Conclusion", icon="🏁"),
 ]
 
 # Activer la navigation
