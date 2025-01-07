@@ -1,5 +1,7 @@
 📽️ Système de Recommandation de Films
 
+Projet réalisé par Vincent, Fatma, Yosser et Damien
+
 🎯 Objectif
 
 L'objectif de ce projet est de développer un système de recommandation de films robuste pour un cinéma situé dans la région de la Creuse. Ce système vise à stimuler l'engagement des clients et à remédier à la baisse des revenus en proposant des suggestions de films personnalisées.
@@ -100,15 +102,10 @@ Basé sur le synopsis suivant du film '{movie_title}', donne-moi 3 mots-clés pe
 
 ├── data/              # Données brutes et transformées
 ├── src/               # Code source du système de recommandation
-├── images/            # Visualisations et graphiques
-├── README.txt         # Présentation du projet et documentation (ce fichier)
+├── images/           # Visualisations et graphiques
+├── README.md          # Présentation du projet et documentation (ce fichier)
 
 🚀 Comment Lancer le Projet
-
-Cloner le Dépôt :
-
-git clone https://github.com/your_username/film-recommendation-system.git
-cd film-recommendation-system
 
 Installer les Dépendances :
 
@@ -116,16 +113,13 @@ pip install -r requirements.txt
 
 Lancer l'Application Streamlit :
 
-streamlit run app/main.py
+streamlit run main.py
 
 Accéder à l'Application :
-Ouvrez l'URL fournie dans votre navigateur web.
+Ouvrez l'URL : https://meetflix.streamlit.app/
 
 📬 Contact
 
 Pour toute question ou suggestion, n'hésitez pas à me contacter :
 
-Email : your_email@example.com
-
-GitHub : your_username
-
+Email : cohen.damien@gmail.com
