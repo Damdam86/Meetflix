@@ -113,7 +113,7 @@ with col1 :
 
     st.markdown("### **📈 Bibliothèques pour la visualisation des données :**")
     st.markdown("""
-    - 📊 **Matplotlib** et 🎨 **Seaborn** : visualisation de données pour comprendre les tendances et les distributions.
+    - 📊 **Matplotlib**, **Plotly-Express** et 🎨 **Seaborn** : visualisation de données pour comprendre les tendances et les distributions.
     """)
 
 with col2 :
