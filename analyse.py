@@ -293,21 +293,8 @@ elif selection == "Etape 4":
         st.plotly_chart(fig3, use_container_width=True)
 
         # Afficher le heatmap
-        df_cleaned = df.select_dtypes(include=['float64', 'int64'])
-
-        # Si tu souhaites aussi exclure certaines colonnes spécifiques (comme 'id' ou d'autres colonnes inutiles)
-        df_cleaned = df_cleaned.drop(columns=['id'], errors='ignore')  # Ajoute d'autres colonnes à exclure si nécessaire
-
-        # Calculer la matrice de corrélation des colonnes numériques restantes
-        corr_matrix = df_cleaned.corr()
-
-        fig4 = plt.figure(figsize=(4, 4))
-        sns.heatmap(corr_matrix, annot=True, cmap='plasma', fmt='.2f', vmin=-1, vmax=1, linewidths=0.5)
-
-        # Ajouter un titre
-        plt.title('Heatmap de Corrélation')
-
-        st.pyplot(fig4)
+        #st.markdown("<p style='font-size:10px;'>Top 10 des acteurs les mieux notés avec au moins 10 films</p>", unsafe_allow_html=True)
+        st.image(r"C:\Users\guilbaud-f\Documents\GitHub\Meetflix\images\Heatmap.png")
 
     with tab2:
         st.header("Genres")
@@ -523,7 +510,7 @@ elif selection == "Etape 4":
             )
 
             # Afficher le graphique dans Streamlit
-            st.plotly_chart(fig)
+            st.plotly_chart(fig,  use_container_width=True)
 
         with col2: 
             st.header(' Crew')   
