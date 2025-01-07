@@ -294,7 +294,7 @@ elif selection == "Etape 4":
 
         # Afficher le heatmap
         #st.markdown("<p style='font-size:10px;'>Top 10 des acteurs les mieux notés avec au moins 10 films</p>", unsafe_allow_html=True)
-        st.image(r"C:\Users\guilbaud-f\Documents\GitHub\Meetflix\images\Heatmap.png")
+        st.image("images\Heatmap.png")
 
     with tab2:
         st.header("Genres")
@@ -469,7 +469,8 @@ elif selection == "Etape 4":
                     cast = ast.literal_eval(cast_list) if isinstance(cast_list, str) else []
                     # Extraire les noms des acteurs (top_n premiers)
                     return ', '.join([person['name'] for person in cast[:top_n]])
-                except (ValueError, TypeError):
+                except (ValueError, TypeError) as e:
+                    print("Error:", e)
                     # Gérer les erreurs (par exemple : cast_list n'est pas une liste valide)
                     return None
                 # Appliquer la fonction pour extraire les acteurs principaux
@@ -478,11 +479,15 @@ elif selection == "Etape 4":
             # Afficher un aperçu des données
             #st.write("Aperçu des films et acteurs principaux :")
             #st.dataframe(df[['title', 'main_actors']])
-
+            print("Colonne main_actors :")
+            print(df['main_actors'].head())
             # Créer une liste de tous les acteurs principaux
             all_actors = df['main_actors'].dropna().str.split(', ').explode()
             all_actors = all_actors.str.strip()
 
+            all_actors = df['main_actors'].dropna().str.split(', ').explode()
+            print("Liste all_actors après explode :")
+            print(all_actors.head(10))  #
             # Compter les occurrences des acteurs
             actor_counts = Counter(all_actors)
 
