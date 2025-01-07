@@ -530,7 +530,7 @@ elif selection == "Etape 5":
         - **Données numériques TMDB utilisées** : Utilisation de la popularité des films avec application d'un scaler `StandardScaler`.
         - **Données non numériques TMDB utilisées** : Conversion de tous les genres + les acteurs principaux (5 premiers) en variables numériques via `get_dummies`.  
         - **Données non numériques autres utilisées** : Ajout des 3 mots-clés par film créer à partir de l'API OpenAI. Ses mots clés sont ensuites convertis en variable numérique avec `get_dummies`. 
-        - **Distance :** Choix de la distance de Minkowski avec un paramètre de `k=26`.  
+        - **Distance :** Choix de la distance de Minkowski avec un paramètre `n_neighbors = 26`.  
         """)
 
     with col2:
