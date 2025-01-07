@@ -255,7 +255,7 @@ elif selection == "Etape 3":
                 <p><strong>Deuxièmement</strong>, nous avons utilisé la référence <strong>Details</strong> de <strong>Movie</strong> pour récupérer des informations supplémentaires sur chaque film, telles que la durée exacte (runtime).</p>
                 <p><strong>Troisièmement</strong>, nous avons récupéré la distribution (le cast) de chaque film grâce à la référence <strong>Credits</strong> de <strong>Movie</strong>, ce qui nous a permis d'obtenir la liste complète des acteurs et des membres de l'équipe associés à chaque œuvre.</p>
                 <p><strong>Quatrièmement</strong>, nous avons récupéré des informations détaillées sur chaque personne du cast en utilisant la référence <strong>Details</strong> de <strong>Person</strong>. Cela nous a permis d'enrichir nos données avec des détails tels que la biographie, la date de naissance, ou encore la filmographie de chaque acteur et membre de l'équipe.</p>
-                
+                <p><strong>Résultat : Le nombre de films dans la base est de 3 672.</strong>
                 """, unsafe_allow_html=True)
     
 

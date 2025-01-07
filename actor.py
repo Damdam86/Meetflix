@@ -112,7 +112,7 @@ else:
                  labels={
         "x": "Année de sortie",  
         "y": "Nombre de films",  
-                        },  title="Nombre de films par année de l'aacteur")
+                        },  title="Nombre de films par année de l'acteur")
 
     # Vérifier que les détails de l'acteur ont été correctement récupérés
     if actor_details is None:
