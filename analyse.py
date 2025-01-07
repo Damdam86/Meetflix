@@ -294,7 +294,7 @@ elif selection == "Etape 4":
 
         # Afficher le heatmap
         #st.markdown("<p style='font-size:10px;'>Top 10 des acteurs les mieux notés avec au moins 10 films</p>", unsafe_allow_html=True)
-        st.image("images\Heatmap.png")
+        st.image("images/Heatmap.png")
 
     with tab2:
         st.header("Genres")
