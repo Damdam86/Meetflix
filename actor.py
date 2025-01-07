@@ -108,8 +108,11 @@ else:
 
     #Statistique de l'acteur
     fig, ax = plt.subplots(figsize=(5, 3))
-
-    fig2 = px.bar(df_movies, x=movies_per_year.index, y=movies_per_year.values)
+    fig = px.bar(df_movies, x=movies_per_year.index, y=movies_per_year.values, 
+                 labels={
+        "x": "Année de sortie",  
+        "y": "Nombre de films",  
+                        },  title="Nombre de films par année de l'aacteur")
 
     # Vérifier que les détails de l'acteur ont été correctement récupérés
     if actor_details is None:
@@ -129,7 +132,7 @@ else:
         with col3:
             st.markdown(f"**Biographie :** {actor_details.get('biography', 'Biographie non disponible')}")
             # Afficher le graphique dans Streamlit
-            st.plotly_chart(fig2, use_container_width=True, transparent=True, theme=None)
+            st.plotly_chart(fig, use_container_width=True, transparent=True, theme=None)
 
 
         # Affichage des films

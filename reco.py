@@ -164,9 +164,7 @@ for i, movie in enumerate(random_movies):
             </div>
         """, unsafe_allow_html=True)
 
-st.markdown("# Testez nos recommandations")
-
-st.subheader("Basé sur un film")
+st.markdown("# Testez nos recommandations à partir d'un film")
 st.write("Indiquez un film et nous vous recommanderons des titres similaires.")
 # Utilisation du selectbox pour choisir un film
 titres = data['title'].tolist()
