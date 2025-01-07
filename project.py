@@ -109,7 +109,6 @@ with col1 :
     st.markdown("### **🤖 Librairies pour la recommandation et le machine learning :**")
     st.markdown("""
     - 🧠 **Scikit-learn** : calcul de similarité, algorithmes de recommandation et outils d'apprentissage automatique.
-    - 🎲 **Surprise** (optionnel) : pour le filtrage collaboratif.
     """)
 
     st.markdown("### **📈 Bibliothèques pour la visualisation des données :**")
