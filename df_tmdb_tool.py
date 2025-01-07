@@ -176,7 +176,7 @@ def get_df_with_genres(df_tmdb : pd.DataFrame, genres : List[Union[int, str]]) -
         genre_ids.add(genre)
     else:
       raise ValueError("La valeur entré n'est ni un int ni un str")
-  return df_tmdb[df_tmdb['genres'].apply(lambda x: any(g['id'] in genre_ids for g in x))]
+  return df_tmdb[df_tmdb['genres'].apply( lambda genre_list: all(g_id in [g['id'] for g in genre_list] for g_id in genre_ids))]
 
 # return a dataframe of movies that contain the origin countries given in parameter 
 def get_df_with_origin_country(df_tmdb : pd.DataFrame, origin_country : List[str]) -> pd.DataFrame : 
