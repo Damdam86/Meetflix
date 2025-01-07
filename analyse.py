@@ -261,7 +261,7 @@ elif selection == "Etape 3":
 
 #Etape 4
 elif selection == "Etape 4":
-    st.title("Statistique TMDB")
+    st.title("Statistiques TMDB")
     tab1, tab2, tab3, tab4 = st.tabs(["Cinematic Overview", "Genres", "RunTime", "Cast & Crew"])
     with tab1:
         df['release_year'] = pd.to_datetime(df['release_date'], errors='coerce').dt.year
