@@ -113,7 +113,7 @@ def create_and_train_pipeline(X_extended):
 
     # Préparation du pipeline pour le modèle KNN
     pipeline = Pipeline([
-        ('knn', NearestNeighbors(n_neighbors=26, metric='minkowski'))  # KNN uniquement
+        ('knn', NearestNeighbors(n_neighbors=16, metric='minkowski'))  # KNN uniquement
     ])
 
     # Entraînement du modèle KNN
