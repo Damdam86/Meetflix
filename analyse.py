@@ -520,7 +520,7 @@ elif selection == "Etape 4":
 #Etape 5
 elif selection == "Etape 5":
     st.title("Le système de recommandation")
-    st.image('images/knn.png')
+    st.image('images/KNN.png')
     
     col1, col2 = st.columns(2)
     with col1:
