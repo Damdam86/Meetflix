@@ -98,7 +98,7 @@ col1, col2 = st.columns(2)
 with col1 :
     st.markdown("### **💻 Langages :**")
     st.markdown("- 🐍 **Python** : pour le développement global du projet.")
-    st.markdown("- 🌐 **HTML** et 🎨 **HTML** : pour la mise en page, le design et les effets sur les pages, textes et images. ")
+    st.markdown("- 🌐 **HTML** et 🎨 **CSS** : pour la mise en page, le design et les effets sur les pages, textes et images. ")
 
     st.markdown("### **📊 Librairies de manipulation des données :**")
     st.markdown("""
