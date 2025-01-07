@@ -294,7 +294,11 @@ elif selection == "Etape 4":
 
         # Afficher le heatmap
         #st.markdown("<p style='font-size:10px;'>Top 10 des acteurs les mieux notés avec au moins 10 films</p>", unsafe_allow_html=True)
-        st.image("images/Heatmap.png")
+        col1, col2, col3 = st.columns([1, 2, 1])
+
+        with col2:
+            st.image("images/Heatmap.png")
+       # st.image("images/Heatmap.png")
 
     with tab2:
         st.header("Genres")
@@ -456,68 +460,12 @@ elif selection == "Etape 4":
 
     with tab4:
         
-        col1, col2 = st.columns(2)
-        with col1:
+        #col1, col2 = st.columns(2)
+        #with col1:
             st.header("Cast")          
-            #st.subheader('Top 10 des acteurs les mieux notés avec au moins 10 films')
-            #st.markdown("<p style='font-size:10px;'>Top 10 des acteurs les mieux notés avec au moins 10 films</p>", unsafe_allow_html=True)
-            #st.image(r"C:\Users\guilbaud-f\Documents\GitHub\Meetflix\images\TOP10_acteurs.png")
-            from collections import Counter
-            def extract_actors(cast_list, top_n=2):
-                try:
-                    # Convertir la chaîne de caractères en liste de dictionnaires
-                    cast = ast.literal_eval(cast_list) if isinstance(cast_list, str) else []
-                    # Extraire les noms des acteurs (top_n premiers)
-                    return ', '.join([person['name'] for person in cast[:top_n]])
-                except (ValueError, TypeError) as e:
-                    print("Error:", e)
-                    # Gérer les erreurs (par exemple : cast_list n'est pas une liste valide)
-                    return None
-                # Appliquer la fonction pour extraire les acteurs principaux
-            df['main_actors'] = df['cast'].apply(lambda x: extract_actors(x, top_n=2))
+            st.image("images/Top 10 Acteurs.png")
 
-            # Afficher un aperçu des données
-            #st.write("Aperçu des films et acteurs principaux :")
-            #st.dataframe(df[['title', 'main_actors']])
-            print("Colonne main_actors :")
-            print(df['main_actors'].head())
-            # Créer une liste de tous les acteurs principaux
-            all_actors = df['main_actors'].dropna().str.split(', ').explode()
-            all_actors = all_actors.str.strip()
-
-            all_actors = df['main_actors'].dropna().str.split(', ').explode()
-            print("Liste all_actors après explode :")
-            print(all_actors.head(10))  #
-            # Compter les occurrences des acteurs
-            actor_counts = Counter(all_actors)
-
-            # Créer un DataFrame pour visualiser
-            actors_df = pd.DataFrame(actor_counts.items(), columns=['Actor', 'Count']).sort_values(by='Count', ascending=False)
-
-            # Visualisation avec Plotly
-            fig = px.bar(
-                actors_df.head(10),  # Top 10 acteurs
-                x='Actor',
-                y='Count',
-                title="Top 10 des acteurs principaux les plus présents",
-                color='Count',
-                color_continuous_scale='plasma'
-            )
-
-            # Mise à jour du design du graphique
-            fig.update_layout(
-                xaxis_title="Acteurs",
-                yaxis_title="Nombre d'apparitions",
-                xaxis_tickangle=-45,
-                height=600,
-                width=800,
-                margin=dict(l=50, r=50, t=50, b=150)
-            )
-
-            # Afficher le graphique dans Streamlit
-            st.plotly_chart(fig,  use_container_width=True)
-
-        with col2: 
+        #with col2: 
             st.header(' Crew')   
             director_votes = df.explode('cast')
             director_votes = director_votes[director_votes['cast'].apply(
@@ -544,11 +492,6 @@ elif selection == "Etape 4":
 
 
             director_stats = director_stats.sort_values(by='film_count', ascending=False)
-
-
-            import plotly.express as px
-
-
             fig2 = px.bar(
             director_stats.head(10),  # Afficher les 10 meilleurs
             x='director_name',
@@ -577,7 +520,7 @@ elif selection == "Etape 4":
 #Etape 5
 elif selection == "Etape 5":
     st.title("Le système de recommandation")
-    st.image('images/KNN.png')
+    st.image('images/knn.png')
     
     col1, col2 = st.columns(2)
     with col1:
