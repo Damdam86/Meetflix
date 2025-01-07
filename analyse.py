@@ -540,6 +540,7 @@ elif selection == "Etape 5":
             """
             - **Principe :** Analyse des synopsis de plus de 4000 films pour générer des mots-clés représentatifs.  
             - **Utilisation :** Ces mots-clés sont utilisés pour améliorer la précision des recommandations basées sur le contenu.
+            - **Model utilisé** : gpt-4-turbo-preview
             - **Prompt utilisé :** f"Basé sur le synopsis suivant du film '{movie_title}', donne-moi 3 mots-clés pertinents :{movie_overview}. Utilise des mots-clés simples (1 mot) qui résument bien le film. L'objectif est d'avoir des mots-clés pertinents afin de pouvoir entraîner un modèle de machine learning et ainsi faire des suggestions de films."
             """
         )
