@@ -13,11 +13,11 @@ import requests
 
 
 api_key = st.secrets['API_KEY']
-tmdb_file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list2.csv'
+tmdb_file_path='https://sevlacgames.com/tmdb/new_tmdb_movie_list3.csv'
 keywords_dummies_file_path='https://sevlacgames.com/tmdb/keywords_dummies.csv'
 genres_dummies_file_path='https://sevlacgames.com/tmdb/genres_dummies.csv'
 cast_dummies_file_path='https://sevlacgames.com/tmdb/cast_dummies.csv'
-X_extended_file_path='https://sevlacgames.com/tmdb/X_extended.csv'
+X_extended_file_path='https://sevlacgames.com/tmdb/X_extended-2.csv'
 
 # On load les datas (recoltées par l'API TMDB)
 @st.cache_data
