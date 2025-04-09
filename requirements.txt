@@ -1,6 +1,7 @@
 streamlit
 numpy
 pandas
+matplotlib
 plotly
 seaborn
 scikit-learn
@@ -8,4 +9,5 @@ setuptools
 streamlit_antd_components
 streamlit_jupyter
 requests
-folium
+nbformat
+nbconvert
